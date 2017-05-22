@@ -1,0 +1,52 @@
+package potter.linq.tests;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Iterator;
+
+/**
+ * Provides static methods for making assertions on collections.
+ *
+ * @author Daniel Potter
+ */
+public class CollectionAssert
+{
+    /**
+     * Asserts that two sequences are equivalent.
+     *
+     * @param expected
+     *            The sequence with the expected items.
+     * @param actual
+     *            The sequence to assert.
+     */
+    public static void assertSequenceEquals(Iterable<?> expected, Iterable<?> actual)
+    {
+        if (expected == null)
+        {
+            assertNull(actual);
+        }
+        else
+        {
+            assertNotNull(actual);
+        }
+
+        Iterator<?> expectedIterator = expected.iterator();
+        Iterator<?> actualIterator = actual.iterator();
+
+        while (expectedIterator.hasNext())
+        {
+            assertTrue("The actual sequence contains too few items.", actualIterator.hasNext());
+
+            Object expectedItem = expectedIterator.next();
+            Object actualItem = actualIterator.next();
+
+            assertEquals(expectedItem, actualItem);
+        }
+
+        assertFalse("The actual sequence contains too many items.", actualIterator.hasNext());
+    }
+}

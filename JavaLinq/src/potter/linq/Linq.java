@@ -59,6 +59,15 @@ public class Linq
 
     public static <TSource> Iterable<TSource> where(Iterable<TSource> source, Function<TSource, Boolean> predicate)
     {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (predicate == null)
+        {
+            throw new IllegalArgumentException("predicate is null.");
+        }
+
         Iterator<TSource> sourceIterator = source.iterator();
         return new Iterable<TSource>()
         {
@@ -109,8 +118,9 @@ public class Linq
         @Override
         public boolean hasNext()
         {
-            if (hasBeenRead == false)
+            if (hasBeenRead)
             {
+                hasBeenRead = false;
                 return moveNext();
             }
 
@@ -128,6 +138,7 @@ public class Linq
                 }
             }
 
+            hasBeenRead = true;
             return getCurrent();
         }
     }
