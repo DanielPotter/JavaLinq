@@ -1,6 +1,7 @@
 package potter.linq;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
@@ -16,6 +17,7 @@ public class Linq
             sequenceIterator.next();
             count++;
         }
+
         return count;
     }
 
@@ -26,7 +28,33 @@ public class Linq
         {
             list.add(element);
         }
+
         return list;
+    }
+
+    public static <TSource, TKey> HashMap<TKey, TSource> toDictionary(Iterable<TSource> source, Function<TSource, TKey> keySelector)
+    {
+        HashMap<TKey, TSource> dictionary = new HashMap<TKey, TSource>();
+        for (TSource value : source)
+        {
+            TKey key = keySelector.apply(value);
+            dictionary.put(key, value);
+        }
+
+        return dictionary;
+    }
+
+    public static <TSource, TKey, TElement> HashMap<TKey, TElement> toDictionary(Iterable<TSource> source, Function<TSource, TKey> keySelector, Function<TSource, TElement> elementSelector)
+    {
+        HashMap<TKey, TElement> dictionary = new HashMap<TKey, TElement>();
+        for (TSource item : source)
+        {
+            TKey key = keySelector.apply(item);
+            TElement value = elementSelector.apply(item);
+            dictionary.put(key, value);
+        }
+
+        return dictionary;
     }
 
     public static <TSource> Iterable<TSource> where(Iterable<TSource> source, Function<TSource, Boolean> predicate)
@@ -99,6 +127,7 @@ public class Linq
                     throw new NoSuchElementException("Cannot iterate past the end of the collection.");
                 }
             }
+
             return getCurrent();
         }
     }
