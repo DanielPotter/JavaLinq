@@ -3,7 +3,7 @@ package potter.linq;
 import java.util.Iterator;
 
 public interface IEnumerator<T> extends Iterator<T> {
-	T getCurrent();
+    T getCurrent();
 
-	boolean moveNext();
+    boolean moveNext();
 }
