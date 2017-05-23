@@ -2,6 +2,15 @@ package potter.linq;
 
 import java.util.NoSuchElementException;
 
+/**
+ * Implements base logic for an iterable where the existence of the next element
+ * is not known until an attempt to move to the next element is made.
+ * 
+ * @author Daniel Potter
+ *
+ * @param <T>
+ *            The type of objects to enumerate.
+ */
 abstract class DynamicIterator<T> implements IEnumerator<T>
 {
     private boolean hasBeenRead = true;
