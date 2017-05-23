@@ -8,6 +8,10 @@ import java.util.function.Function;
 
 public class Linq
 {
+    // region: Aggregation
+
+    // region: Count
+
     public static <TSource> int count(Iterable<TSource> source)
     {
         if (source == null)
@@ -26,6 +30,10 @@ public class Linq
         return count;
     }
 
+    // endregion
+
+    // region: To Collection
+
     public static <TSource> ArrayList<TSource> toArrayList(Iterable<TSource> source)
     {
         if (source == null)
@@ -42,7 +50,8 @@ public class Linq
         return list;
     }
 
-    public static <TSource, TKey> HashMap<TKey, TSource> toDictionary(Iterable<TSource> source, Function<TSource, TKey> keySelector)
+    public static <TSource, TKey> HashMap<TKey, TSource> toDictionary(Iterable<TSource> source,
+        Function<TSource, TKey> keySelector)
     {
         if (source == null)
         {
@@ -63,7 +72,8 @@ public class Linq
         return dictionary;
     }
 
-    public static <TSource, TKey, TElement> HashMap<TKey, TElement> toDictionary(Iterable<TSource> source, Function<TSource, TKey> keySelector, Function<TSource, TElement> elementSelector)
+    public static <TSource, TKey, TElement> HashMap<TKey, TElement> toDictionary(Iterable<TSource> source,
+        Function<TSource, TKey> keySelector, Function<TSource, TElement> elementSelector)
     {
         if (source == null)
         {
@@ -88,6 +98,14 @@ public class Linq
 
         return dictionary;
     }
+
+    // endregion
+
+    // endregion
+
+    // region: Mutating
+
+    // region: Where
 
     public static <TSource> Iterable<TSource> where(Iterable<TSource> source, Function<TSource, Boolean> predicate)
     {
@@ -126,6 +144,10 @@ public class Linq
             }
         };
     }
+
+    // endregion
+
+    // endregion
 
     private static abstract class SimpleIterator<T> extends DynamicIterator<T>
     {
