@@ -119,7 +119,6 @@ public class Linq
             throw new IllegalArgumentException("selector is null.");
         }
 
-        Iterator<TSource> sourceIterator = source.iterator();
         return new Iterable<TResult>()
         {
             @Override
@@ -127,6 +126,8 @@ public class Linq
             {
                 return new SimpleIterator<TResult>()
                 {
+                    private Iterator<TSource> sourceIterator = source.iterator();
+
                     @Override
                     public boolean moveNext()
                     {
@@ -160,7 +161,6 @@ public class Linq
             throw new IllegalArgumentException("predicate is null.");
         }
 
-        Iterator<TSource> sourceIterator = source.iterator();
         return new Iterable<TSource>()
         {
             @Override
@@ -168,6 +168,8 @@ public class Linq
             {
                 return new SimpleIterator<TSource>()
                 {
+                    private Iterator<TSource> sourceIterator = source.iterator();
+
                     @Override
                     public boolean moveNext()
                     {

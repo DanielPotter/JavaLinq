@@ -40,4 +40,26 @@ public class SelectTests
         // Assert
         CollectionAssert.assertSequenceEquals(expectedElements, actualElements);
     }
+
+    @Test
+    public void select_iterateTwice_selectsElements()
+    {
+        // Arrange
+        ArrayList<Integer> source = new ArrayList<>();
+        source.add(1);
+        source.add(2);
+        source.add(3);
+
+        ArrayList<String> expectedElements = new ArrayList<>();
+        expectedElements.add("1");
+        expectedElements.add("2");
+        expectedElements.add("3");
+
+        // Act
+        Iterable<String> actualElements = Linq.select(source, item -> item.toString());
+
+        // Assert
+        CollectionAssert.assertSequenceEquals(expectedElements, actualElements);
+        CollectionAssert.assertSequenceEquals(expectedElements, actualElements);
+    }
 }
