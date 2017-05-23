@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Provides static methods for making assertions on collections.
@@ -28,11 +29,10 @@ public class CollectionAssert
         if (expected == null)
         {
             assertNull(actual);
+            return;
         }
-        else
-        {
-            assertNotNull(actual);
-        }
+
+        assertNotNull(actual);
 
         Iterator<?> expectedIterator = expected.iterator();
         Iterator<?> actualIterator = actual.iterator();
@@ -48,5 +48,26 @@ public class CollectionAssert
         }
 
         assertFalse("The actual sequence contains too many items.", actualIterator.hasNext());
+    }
+
+    /**
+     * Asserts that two maps are equivalent.
+     *
+     * @param expected
+     *            The map with the expected entries.
+     * @param actual
+     *            The map to assert.
+     */
+    public static void assertMapEquals(Map<?, ?> expected, Map<?, ?> actual)
+    {
+        if (expected == null)
+        {
+            assertNull(actual);
+            return;
+        }
+
+        assertNotNull(actual);
+
+        assertSequenceEquals(expected.entrySet(), actual.entrySet());
     }
 }

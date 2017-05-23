@@ -10,6 +10,11 @@ public class Linq
 {
     public static <TSource> int count(Iterable<TSource> source)
     {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
         int count = 0;
         Iterator<TSource> sequenceIterator = source.iterator();
         while (sequenceIterator.hasNext())
@@ -23,6 +28,11 @@ public class Linq
 
     public static <TSource> ArrayList<TSource> toArrayList(Iterable<TSource> source)
     {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
         ArrayList<TSource> list = new ArrayList<>();
         for (TSource element : source)
         {
@@ -34,6 +44,15 @@ public class Linq
 
     public static <TSource, TKey> HashMap<TKey, TSource> toDictionary(Iterable<TSource> source, Function<TSource, TKey> keySelector)
     {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (keySelector == null)
+        {
+            throw new IllegalArgumentException("keySelector is null.");
+        }
+
         HashMap<TKey, TSource> dictionary = new HashMap<TKey, TSource>();
         for (TSource value : source)
         {
@@ -46,6 +65,19 @@ public class Linq
 
     public static <TSource, TKey, TElement> HashMap<TKey, TElement> toDictionary(Iterable<TSource> source, Function<TSource, TKey> keySelector, Function<TSource, TElement> elementSelector)
     {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (keySelector == null)
+        {
+            throw new IllegalArgumentException("keySelector is null.");
+        }
+        if (elementSelector == null)
+        {
+            throw new IllegalArgumentException("elementSelector is null.");
+        }
+
         HashMap<TKey, TElement> dictionary = new HashMap<TKey, TElement>();
         for (TSource item : source)
         {
