@@ -3,7 +3,6 @@ package potter.linq;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 public class Linq
@@ -107,7 +106,7 @@ public class Linq
 
     // region: Select
 
-    public static <TSource, TResult> Iterable<TResult> select(Iterable<TSource> source,
+    public static <TSource, TResult> IEnumerable<TResult> select(Iterable<TSource> source,
         Function<TSource, TResult> selector)
     {
         if (source == null)
@@ -119,38 +118,34 @@ public class Linq
             throw new IllegalArgumentException("selector is null.");
         }
 
-        return new Iterable<TResult>()
+        return new LinqIterable<>(() ->
         {
-            @Override
-            public Iterator<TResult> iterator()
+            return new SimpleIterator<TResult>()
             {
-                return new SimpleIterator<TResult>()
+                private Iterator<TSource> sourceIterator = source.iterator();
+
+                @Override
+                public boolean moveNext()
                 {
-                    private Iterator<TSource> sourceIterator = source.iterator();
-
-                    @Override
-                    public boolean moveNext()
+                    if (sourceIterator.hasNext())
                     {
-                        if (sourceIterator.hasNext())
-                        {
-                            TSource input = sourceIterator.next();
-                            TResult currentValue = selector.apply(input);
-                            setCurrent(currentValue);
-                            return true;
-                        }
-
-                        return false;
+                        TSource input = sourceIterator.next();
+                        TResult currentValue = selector.apply(input);
+                        setCurrent(currentValue);
+                        return true;
                     }
-                };
-            }
-        };
+
+                    return false;
+                }
+            };
+        });
     }
 
     // endregion
 
     // region: Where
 
-    public static <TSource> Iterable<TSource> where(Iterable<TSource> source, Function<TSource, Boolean> predicate)
+    public static <TSource> IEnumerable<TSource> where(Iterable<TSource> source, Function<TSource, Boolean> predicate)
     {
         if (source == null)
         {
@@ -161,83 +156,31 @@ public class Linq
             throw new IllegalArgumentException("predicate is null.");
         }
 
-        return new Iterable<TSource>()
+        return new LinqIterable<>(() ->
         {
-            @Override
-            public Iterator<TSource> iterator()
+            return new SimpleIterator<TSource>()
             {
-                return new SimpleIterator<TSource>()
-                {
-                    private Iterator<TSource> sourceIterator = source.iterator();
+                private Iterator<TSource> sourceIterator = source.iterator();
 
-                    @Override
-                    public boolean moveNext()
+                @Override
+                public boolean moveNext()
+                {
+                    while (sourceIterator.hasNext())
                     {
-                        while (sourceIterator.hasNext())
+                        setCurrent(sourceIterator.next());
+                        if (predicate.apply(getCurrent()))
                         {
-                            setCurrent(sourceIterator.next());
-                            if (predicate.apply(getCurrent()))
-                            {
-                                return true;
-                            }
+                            return true;
                         }
-
-                        return false;
                     }
-                };
-            }
-        };
-    }
 
-    // endregion
-
-    // endregion
-
-    private static abstract class SimpleIterator<T> extends DynamicIterator<T>
-    {
-        private T current;
-
-        @Override
-        public T getCurrent()
-        {
-            return current;
-        }
-
-        protected void setCurrent(T value)
-        {
-            current = value;
-        }
-    }
-
-    private static abstract class DynamicIterator<T> implements IEnumerator<T>
-    {
-        private boolean hasBeenRead = true;
-
-        @Override
-        public boolean hasNext()
-        {
-            if (hasBeenRead)
-            {
-                hasBeenRead = false;
-                return moveNext();
-            }
-
-            return true;
-        }
-
-        @Override
-        public T next()
-        {
-            if (hasBeenRead)
-            {
-                if (moveNext() == false)
-                {
-                    throw new NoSuchElementException("Cannot iterate past the end of the collection.");
+                    return false;
                 }
-            }
-
-            hasBeenRead = true;
-            return getCurrent();
-        }
+            };
+        });
     }
+
+    // endregion
+
+    // endregion
 }
