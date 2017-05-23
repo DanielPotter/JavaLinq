@@ -27,6 +27,52 @@ public interface IEnumerable<T> extends Iterable<T>
 
     // region: Aggregation
 
+    // region: All
+
+    /**
+     * Determines whether all elements of a sequence satisfy a condition.
+     *
+     * @param predicate
+     *            A function to test each element for a condition.
+     * @return <code>true</code> if every element of the source sequence passes
+     *         the test in the specified predicate, or if the sequence is empty;
+     *         otherwise, <code>false</code>.
+     */
+    default boolean all(Function<T, Boolean> predicate)
+    {
+        return Linq.all(this, predicate);
+    }
+
+    // endregion
+
+    // region: Any
+
+    /**
+     * Determines whether a sequence contains any elements.
+     *
+     * @return <code>true</code> if the source sequence contains any elements;
+     *         otherwise, <code>false</code>.
+     */
+    default boolean any()
+    {
+        return Linq.any(this);
+    }
+
+    /**
+     * Determines whether any element of a sequence satisfies a condition.
+     *
+     * @param predicate
+     *            A function to test each element for a condition.
+     * @return <code>true</code> if any elements in the source sequence pass the
+     *         test in the specified predicate; otherwise, <code>false</code>.
+     */
+    default boolean any(Function<T, Boolean> predicate)
+    {
+        return Linq.any(this, predicate);
+    }
+
+    // endregion
+
     // region: Count
 
     /**

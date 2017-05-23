@@ -15,6 +15,106 @@ public class Linq
 {
     // region: Aggregation
 
+    // region: All
+
+    /**
+     * Determines whether all elements of a sequence satisfy a condition.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} that contains the elements to apply the
+     *            predicate to.
+     * @param predicate
+     *            A function to test each element for a condition.
+     * @return <code>true</code> if every element of the source sequence passes
+     *         the test in the specified predicate, or if the sequence is empty;
+     *         otherwise, <code>false</code>.
+     */
+    public static <TSource> boolean all(Iterable<TSource> source, Function<TSource, Boolean> predicate)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (predicate == null)
+        {
+            throw new IllegalArgumentException("predicate is null.");
+        }
+
+        for (TSource item : source)
+        {
+            if (predicate.apply(item) == false)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // endregion
+
+    // region: Any
+
+    /**
+     * Determines whether a sequence contains any elements.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} whose elements to which to apply the
+     *            predicate.
+     * @return <code>true</code> if the source sequence contains any elements;
+     *         otherwise, <code>false</code>.
+     */
+    public static <TSource> boolean any(Iterable<TSource> source)
+    {
+        if (source == null)
+        {
+            return false;
+        }
+
+        return source.iterator().hasNext();
+    }
+
+    /**
+     * Determines whether any element of a sequence satisfies a condition.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} whose elements to which to apply the
+     *            predicate.
+     * @param predicate
+     *            A function to test each element for a condition.
+     * @return <code>true</code> if any elements in the source sequence pass the
+     *         test in the specified predicate; otherwise, <code>false</code>.
+     */
+    public static <TSource> boolean any(Iterable<TSource> source, Function<TSource, Boolean> predicate)
+    {
+        if (source == null)
+        {
+            return false;
+        }
+        if (predicate == null)
+        {
+            throw new IllegalArgumentException("predicate is null.");
+        }
+
+        for (TSource item : source)
+        {
+            if (predicate.apply(item))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // endregion
+
     // region: Count
 
     /**
