@@ -105,6 +105,48 @@ public class Linq
 
     // region: Mutating
 
+    // region: Select
+
+    public static <TSource, TResult> Iterable<TResult> select(Iterable<TSource> source,
+        Function<TSource, TResult> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        Iterator<TSource> sourceIterator = source.iterator();
+        return new Iterable<TResult>()
+        {
+            @Override
+            public Iterator<TResult> iterator()
+            {
+                return new SimpleIterator<TResult>()
+                {
+                    @Override
+                    public boolean moveNext()
+                    {
+                        if (sourceIterator.hasNext())
+                        {
+                            TSource input = sourceIterator.next();
+                            TResult currentValue = selector.apply(input);
+                            setCurrent(currentValue);
+                            return true;
+                        }
+
+                        return false;
+                    }
+                };
+            }
+        };
+    }
+
+    // endregion
+
     // region: Where
 
     public static <TSource> Iterable<TSource> where(Iterable<TSource> source, Function<TSource, Boolean> predicate)
