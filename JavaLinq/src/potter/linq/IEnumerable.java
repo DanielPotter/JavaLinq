@@ -278,6 +278,22 @@ public interface IEnumerable<T> extends Iterable<T>
         return Linq.where(this, predicate);
     }
 
+    /**
+     * Filters a sequence of values based on a predicate. Each element's index
+     * is used in the logic of the predicate function.
+     *
+     * @param predicate
+     *            A function to test each source element for a condition; the
+     *            second parameter of the function represents the index of the
+     *            source element.
+     * @return An {@link Iterable} that contains elements from the input
+     *         sequence that satisfy the condition.
+     */
+    default IEnumerable<T> where(BiFunction<T, Integer, Boolean> predicate)
+    {
+        return Linq.where(this, predicate);
+    }
+
     // endregion
 
     // endregion

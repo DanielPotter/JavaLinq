@@ -602,28 +602,80 @@ public class Linq
             throw new IllegalArgumentException("predicate is null.");
         }
 
-        return new EnumerableAdapter<>(() ->
+        return new EnumerableAdapter<>(() -> new WhereEnumerator<TSource>(source.iterator())
         {
-            return new SimpleIterator<TSource>()
+            @Override
+            public boolean include(TSource item, int index)
             {
-                private Iterator<TSource> sourceIterator = source.iterator();
-
-                @Override
-                public boolean moveNext()
-                {
-                    while (sourceIterator.hasNext())
-                    {
-                        setCurrent(sourceIterator.next());
-                        if (predicate.apply(getCurrent()))
-                        {
-                            return true;
-                        }
-                    }
-
-                    return false;
-                }
-            };
+                return predicate.apply(item);
+            }
         });
+    }
+
+    /**
+     * Filters a sequence of values based on a predicate. Each element's index
+     * is used in the logic of the predicate function.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} to filter.
+     * @param predicate
+     *            A function to test each source element for a condition; the
+     *            second parameter of the function represents the index of the
+     *            source element.
+     * @return An {@link Iterable} that contains elements from the input
+     *         sequence that satisfy the condition.
+     */
+    public static <TSource> IEnumerable<TSource> where(Iterable<TSource> source,
+        BiFunction<TSource, Integer, Boolean> predicate)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (predicate == null)
+        {
+            throw new IllegalArgumentException("predicate is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new WhereEnumerator<TSource>(source.iterator())
+        {
+            @Override
+            public boolean include(TSource item, int index)
+            {
+                return predicate.apply(item, index);
+            }
+        });
+    }
+
+    private static abstract class WhereEnumerator<T> extends SimpleIterator<T>
+    {
+        public WhereEnumerator(Iterator<T> source)
+        {
+            this.source = source;
+        }
+
+        private Iterator<T> source;
+        private int index;
+
+        @Override
+        public boolean moveNext()
+        {
+            while (source.hasNext())
+            {
+                T item = source.next();
+                if (include(item, index++))
+                {
+                    setCurrent(item);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public abstract boolean include(T item, int index);
     }
 
     // endregion
