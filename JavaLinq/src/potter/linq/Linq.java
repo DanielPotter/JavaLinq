@@ -144,6 +144,106 @@ public class Linq
         return count;
     }
 
+    /**
+     * Returns a number that represents how many elements in the specified
+     * sequence satisfy a condition.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            A sequence that contains elements to be tested and counted.
+     * @param predicate
+     *            A function to test each element for a condition.
+     * @return A number that represents how many elements in the sequence
+     *         satisfy the condition in the predicate function.
+     */
+    public static <TSource> int count(Iterable<TSource> source, Function<TSource, Boolean> predicate)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (predicate == null)
+        {
+            throw new IllegalArgumentException("predicate is null.");
+        }
+
+        int count = 0;
+        for (TSource item : source)
+        {
+            if (predicate.apply(item))
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    /**
+     * Returns a {@link Long} that represents the total number of elements in a
+     * sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} that contains elements to be counted.
+     * @return The number of elements in the input sequence.
+     */
+    public static <TSource> long longCount(Iterable<TSource> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        long count = 0;
+        Iterator<TSource> sequenceIterator = source.iterator();
+        while (sequenceIterator.hasNext())
+        {
+            sequenceIterator.next();
+            count++;
+        }
+
+        return count;
+    }
+
+    /**
+     * Returns a {@link Long} that represents how many elements in a sequence
+     * satisfy a condition.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} that contains elements to be counted.
+     * @param predicate
+     *            A function to test each element for a condition.
+     * @return A number that represents how many elements in the sequence
+     *         satisfy the condition in the predicate function.
+     */
+    public static <TSource> long longCount(Iterable<TSource> source, Function<TSource, Boolean> predicate)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (predicate == null)
+        {
+            throw new IllegalArgumentException("predicate is null.");
+        }
+
+        long count = 0;
+        for (TSource item : source)
+        {
+            if (predicate.apply(item))
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
     // endregion
 
     // region: To Collection
@@ -261,7 +361,7 @@ public class Linq
 
     // endregion
 
-    // region: Mutating
+    // region: Mutation
 
     // region: Select
 
