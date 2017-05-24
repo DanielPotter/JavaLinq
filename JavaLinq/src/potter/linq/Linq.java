@@ -3,6 +3,7 @@ package potter.linq;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -391,27 +392,187 @@ public class Linq
             throw new IllegalArgumentException("selector is null.");
         }
 
-        return new EnumerableAdapter<>(() ->
+        return new EnumerableAdapter<>(
+            () -> new SelectEnumerator<TSource, TResult>(source, (item, index) -> selector.apply(item)));
+    }
+
+    /**
+     * Projects each element of a sequence into a new form by incorporating the
+     * element's index.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TResult>
+     *            The type of the value returned by <code>selector</code>.
+     * @param source
+     *            A sequence of values on which to invoke a transform function.
+     * @param selector
+     *            A transform function to apply to each source element; the
+     *            second parameter of the function represents the index of the
+     *            source element.
+     * @return An {@link Iterable} whose elements are the result of invoking the
+     *         transform function on each element of <code>source</code>.
+     */
+    public static <TSource, TResult> IEnumerable<TResult> select(Iterable<TSource> source,
+        BiFunction<TSource, Integer, TResult> selector)
+    {
+        if (source == null)
         {
-            return new SimpleIterator<TResult>()
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new SelectEnumerator<TSource, TResult>(source, selector));
+    }
+
+    private static class SelectEnumerator<TSource, TResult> extends SimpleIterator<TResult>
+    {
+        public SelectEnumerator(Iterable<TSource> source, BiFunction<TSource, Integer, TResult> selector)
+        {
+            this.selector = selector;
+            sourceIterator = source.iterator();
+        }
+
+        private final BiFunction<TSource, Integer, TResult> selector;
+
+        private Iterator<TSource> sourceIterator;
+        private int index;
+
+        @Override
+        public boolean moveNext()
+        {
+            if (sourceIterator.hasNext())
             {
-                private Iterator<TSource> sourceIterator = source.iterator();
+                TSource input = sourceIterator.next();
+                TResult currentValue = selector.apply(input, index++);
+                setCurrent(currentValue);
+                return true;
+            }
 
-                @Override
-                public boolean moveNext()
+            return false;
+        }
+    }
+
+    // endregion
+
+    // region: Select Many
+
+    /**
+     * Projects each element of a sequence to an {@link IEnumerable} and
+     * flattens the resulting sequences into one sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TResult>
+     *            The type of the elements of the sequence returned by
+     *            <code>selector</code>.
+     * @param source
+     *            A sequence of values to project.
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return An {@link IEnumerable} whose elements are the result of invoking
+     *         the one-to-many transform function on each element of the input
+     *         sequence.
+     */
+    public static <TSource, TResult> IEnumerable<TResult> selectMany(Iterable<TSource> source,
+        Function<TSource, Iterable<TResult>> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new SelectManyEnumerator<TSource, TResult>(source)
+        {
+            @Override
+            public Iterable<TResult> convert(TSource item, int index)
+            {
+                return selector.apply(item);
+            }
+        });
+    }
+
+    /**
+     * Projects each element of a sequence to an {@link IEnumerable}, and
+     * flattens the resulting sequences into one sequence. The index of each
+     * source element is used in the projected form of that element.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TResult>
+     *            The type of the elements of the sequence returned by
+     *            <code>selector</code>.
+     * @param source
+     *            A sequence of values to project.
+     * @param selector
+     *            A transform function to apply to each source element; the
+     *            second parameter of the function represents the index of the
+     *            source element.
+     * @return An {@link IEnumerable} whose elements are the result of invoking
+     *         the one-to-many transform function on each element of an input
+     *         sequence.
+     */
+    public static <TSource, TResult> IEnumerable<TResult> selectMany(Iterable<TSource> source,
+        BiFunction<TSource, Integer, Iterable<TResult>> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new SelectManyEnumerator<TSource, TResult>(source)
+        {
+            @Override
+            public Iterable<TResult> convert(TSource item, int index)
+            {
+                return selector.apply(item, index);
+            }
+        });
+    }
+
+    private static abstract class SelectManyEnumerator<TSource, TResult> extends SimpleIterator<TResult>
+    {
+        public SelectManyEnumerator(Iterable<TSource> source)
+        {
+            sourceIterator = source.iterator();
+        }
+
+        private Iterator<TSource> sourceIterator;
+        private Iterator<TResult> currentIterator;
+        private int sourceIndex;
+
+        @Override
+        public boolean moveNext()
+        {
+            while (currentIterator == null || currentIterator.hasNext() == false)
+            {
+                if (sourceIterator.hasNext())
                 {
-                    if (sourceIterator.hasNext())
-                    {
-                        TSource input = sourceIterator.next();
-                        TResult currentValue = selector.apply(input);
-                        setCurrent(currentValue);
-                        return true;
-                    }
-
+                    TSource input = sourceIterator.next();
+                    currentIterator = convert(input, sourceIndex++).iterator();
+                }
+                else
+                {
                     return false;
                 }
-            };
-        });
+            }
+
+            setCurrent(currentIterator.next());
+            return true;
+        }
+
+        public abstract Iterable<TResult> convert(TSource item, int index);
     }
 
     // endregion

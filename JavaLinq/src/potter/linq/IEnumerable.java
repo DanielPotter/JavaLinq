@@ -2,6 +2,7 @@ package potter.linq;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -180,23 +181,84 @@ public interface IEnumerable<T> extends Iterable<T>
 
     // endregion
 
-    // region: Mutating
+    // region: Mutation
 
     // region: Select
 
     /**
-     * Projects each element of the sequence into a new form.
+     * Projects each element of a sequence into a new form.
      *
      * @param <TResult>
      *            The type of the value returned by <code>selector</code>.
      * @param selector
      *            A transform function to apply to each element.
      * @return An {@link Iterable} whose elements are the result of invoking the
-     *         transform function on each element of the source.
+     *         transform function on each element of <code>source</code>.
      */
     default <TResult> IEnumerable<TResult> select(Function<T, TResult> selector)
     {
         return Linq.select(this, selector);
+    }
+
+    /**
+     * Projects each element of a sequence into a new form by incorporating the
+     * element's index.
+     *
+     * @param <TResult>
+     *            The type of the value returned by <code>selector</code>.
+     * @param selector
+     *            A transform function to apply to each source element; the
+     *            second parameter of the function represents the index of the
+     *            source element.
+     * @return An {@link Iterable} whose elements are the result of invoking the
+     *         transform function on each element of <code>source</code>.
+     */
+    default <TResult> IEnumerable<TResult> select(BiFunction<T, Integer, TResult> selector)
+    {
+        return Linq.select(this, selector);
+    }
+
+    // endregion
+
+    // region: Select Many
+
+    /**
+     * Projects each element of a sequence to an {@link IEnumerable} and
+     * flattens the resulting sequences into one sequence.
+     *
+     * @param <TResult>
+     *            The type of the elements of the sequence returned by
+     *            <code>selector</code>.
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return An {@link IEnumerable} whose elements are the result of invoking
+     *         the one-to-many transform function on each element of the input
+     *         sequence.
+     */
+    default <TResult> IEnumerable<TResult> selectMany(Function<T, Iterable<TResult>> selector)
+    {
+        return Linq.selectMany(this, selector);
+    }
+
+    /**
+     * Projects each element of a sequence to an {@link IEnumerable}, and
+     * flattens the resulting sequences into one sequence. The index of each
+     * source element is used in the projected form of that element.
+     *
+     * @param <TResult>
+     *            The type of the elements of the sequence returned by
+     *            <code>selector</code>.
+     * @param selector
+     *            A transform function to apply to each source element; the
+     *            second parameter of the function represents the index of the
+     *            source element.
+     * @return An {@link IEnumerable} whose elements are the result of invoking
+     *         the one-to-many transform function on each element of an input
+     *         sequence.
+     */
+    default <TResult> IEnumerable<TResult> selectMany(BiFunction<T, Integer, Iterable<TResult>> selector)
+    {
+        return Linq.selectMany(this, selector);
     }
 
     // endregion
