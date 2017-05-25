@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -500,6 +501,112 @@ public class Linq
         }
 
         return count;
+    }
+
+    // endregion
+
+    // region: Element At
+
+    /**
+     * Returns the element at a specified index in a sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} from which to return an element.
+     * @param index
+     *            The zero-based index of the element to retrieve.
+     * @return The element at the specified position in the source sequence.
+     */
+    public static <TSource> TSource elementAt(Iterable<TSource> source, int index)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (index < 0)
+        {
+            throw new IndexOutOfBoundsException("index is out of range.");
+        }
+
+        if (source instanceof List<?>)
+        {
+            return ((List<TSource>) source).get(index);
+        }
+
+        Iterator<TSource> iterator = source.iterator();
+        while (true)
+        {
+            if (iterator.hasNext() == false)
+            {
+                throw new IndexOutOfBoundsException("index is out of range.");
+            }
+
+            TSource value = iterator.next();
+
+            if (index == 0)
+            {
+                return value;
+            }
+
+            index--;
+        }
+    }
+
+    /**
+     * Returns the element at a specified index in a sequence or a default value
+     * if the index is out of range.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} from which to return an element.
+     * @param index
+     *            The zero-based index of the element to retrieve.
+     * @return <code>null</code> if the index is outside the bounds of the
+     *         source sequence; otherwise, the element at the specified position
+     *         in the source sequence.
+     */
+    public static <TSource> TSource elementAtOrDefault(Iterable<TSource> source, int index)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        if (index >= 0)
+        {
+            if (source instanceof List<?>)
+            {
+                List<TSource> list = (List<TSource>) source;
+                if (list != null && index < list.size())
+                {
+                    return list.get(index);
+                }
+            }
+            else
+            {
+                Iterator<TSource> iterator = source.iterator();
+                while (true)
+                {
+                    if (iterator.hasNext() == false)
+                    {
+                        break;
+                    }
+
+                    TSource value = iterator.next();
+
+                    if (index == 0)
+                    {
+                        return value;
+                    }
+
+                    index--;
+                }
+            }
+        }
+
+        return null;
     }
 
     // endregion
