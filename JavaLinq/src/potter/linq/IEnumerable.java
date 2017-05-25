@@ -176,6 +176,118 @@ public interface IEnumerable<T> extends Iterable<T>
 
     // endregion
 
+    // region : First
+
+    /**
+     * Returns the first element of a sequence.
+     *
+     * @return The first element in the specified sequence.
+     */
+    default T first()
+    {
+        return Linq.first(this);
+    }
+
+    /**
+     * Returns the first element of a sequence.
+     *
+     * @param predicate
+     *            A function to test each element for a condition.
+     * @return The first element in the sequence that passes the test in the
+     *         specified predicate function.
+     */
+    default T first(Function<T, Boolean> predicate)
+    {
+        return Linq.first(this, predicate);
+    }
+
+    /**
+     * Returns the first element of a sequence, or a default value if the
+     * sequence contains no elements.
+     *
+     * @return <code>null</code> if <code>source</code> is empty; otherwise, the
+     *         first element in <code>source</code>.
+     */
+    default T firstOrDefault()
+    {
+        return Linq.firstOrDefault(this);
+    }
+
+    /**
+     * Returns the first element of the sequence that satisfies a condition or a
+     * default value if no such element is found.
+     *
+     * @param predicate
+     *            A function to test each element for a condition.
+     * @return <code>null</code> if <code>source</code> is empty or if no
+     *         element passes the test specified by <code>predicate</code>;
+     *         otherwise, the first element in <code>source</code> that passes
+     *         the test specified by <code>predicate</code>.
+     */
+    default T firstOrDefault(Function<T, Boolean> predicate)
+    {
+        return Linq.firstOrDefault(this, predicate);
+    }
+
+    // endregion
+
+    // region: Last
+
+    /**
+     * Returns the last element of a sequence.
+     *
+     * @param source
+     *            The {@link Iterable} of which to return the last element.
+     * @return The last element in the specified sequence.
+     */
+    default T last()
+    {
+        return Linq.last(this);
+    }
+
+    /**
+     * Returns the last element of a sequence.
+     *
+     * @param predicate
+     *            A function to test each element for a condition.
+     * @return The last element in the sequence that passes the test in the
+     *         specified predicate function.
+     */
+    default T last(Function<T, Boolean> predicate)
+    {
+        return Linq.last(this, predicate);
+    }
+
+    /**
+     * Returns the last element of a sequence, or a default value if the
+     * sequence contains no elements.
+     *
+     * @return <code>null</code> if <code>source</code> is empty; otherwise, the
+     *         last element in the {@link Iterable}.
+     */
+    default T lastOrDefault()
+    {
+        return Linq.lastOrDefault(this);
+    }
+
+    /**
+     * Returns the last element of the sequence that satisfies a condition or a
+     * default value if no such element is found.
+     *
+     * @param predicate
+     *            A function to test each element for a condition.
+     * @return <code>null</code> if <code>source</code> is empty or if no
+     *         element passes the test specified by <code>predicate</code>;
+     *         otherwise, the last element in <code>source</code> that passes
+     *         the test specified by <code>predicate</code>.
+     */
+    default T lastOrDefault(Function<T, Boolean> predicate)
+    {
+        return Linq.lastOrDefault(this, predicate);
+    }
+
+    // endregion
+
     // region: To Collection
 
     /**

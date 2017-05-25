@@ -611,6 +611,312 @@ public class Linq
 
     // endregion
 
+    // region : First
+
+    /**
+     * Returns the first element of a sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            The {@link Iterable} of which to return the first element.
+     * @return The first element in the specified sequence.
+     */
+    public static <TSource> TSource first(Iterable<TSource> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("The source sequence is empty.");
+        }
+
+        return source.iterator().next();
+    }
+
+    /**
+     * Returns the first element of a sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            The {@link Iterable} of which to return the first element.
+     * @param predicate
+     *            A function to test each element for a condition.
+     * @return The first element in the sequence that passes the test in the
+     *         specified predicate function.
+     */
+    public static <TSource> TSource first(Iterable<TSource> source, Function<TSource, Boolean> predicate)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (predicate == null)
+        {
+            throw new IllegalArgumentException("predicate is null.");
+        }
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("The source sequence is empty.");
+        }
+
+        for (TSource item : source)
+        {
+            if (predicate.apply(item))
+            {
+                return item;
+            }
+        }
+
+        throw new IllegalStateException("No element satisfies the condition in predicate.");
+    }
+
+    /**
+     * Returns the first element of a sequence, or a default value if the
+     * sequence contains no elements.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            The {@link Iterable} of which to return the first element.
+     * @return <code>null</code> if <code>source</code> is empty; otherwise, the
+     *         first element in <code>source</code>.
+     */
+    public static <TSource> TSource firstOrDefault(Iterable<TSource> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            return null;
+        }
+
+        return source.iterator().next();
+    }
+
+    /**
+     * Returns the first element of the sequence that satisfies a condition or a
+     * default value if no such element is found.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            The {@link Iterable} of which to return the first element.
+     * @param predicate
+     *            A function to test each element for a condition.
+     * @return <code>null</code> if <code>source</code> is empty or if no
+     *         element passes the test specified by <code>predicate</code>;
+     *         otherwise, the first element in <code>source</code> that passes
+     *         the test specified by <code>predicate</code>.
+     */
+    public static <TSource> TSource firstOrDefault(Iterable<TSource> source, Function<TSource, Boolean> predicate)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (predicate == null)
+        {
+            throw new IllegalArgumentException("predicate is null.");
+        }
+
+        for (TSource item : source)
+        {
+            if (predicate.apply(item))
+            {
+                return item;
+            }
+        }
+
+        return null;
+    }
+
+    // endregion
+
+    // region: Last
+
+    /**
+     * Returns the last element of a sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            The {@link Iterable} of which to return the last element.
+     * @return The last element in the specified sequence.
+     */
+    public static <TSource> TSource last(Iterable<TSource> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        Iterator<TSource> iterator = source.iterator();
+        if (iterator.hasNext() == false)
+        {
+            throw new IllegalStateException("The source sequence is empty.");
+        }
+
+        if (source instanceof List<?>)
+        {
+            List<TSource> sourceList = (List<TSource>) source;
+            return sourceList.get(sourceList.size() - 1);
+        }
+
+        TSource item = null;
+        do
+        {
+            item = iterator.next();
+        }
+        while (iterator.hasNext());
+
+        return item;
+    }
+
+    /**
+     * Returns the last element of a sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            The {@link Iterable} of which to return the last element.
+     * @param predicate
+     *            A function to test each element for a condition.
+     * @return The last element in the sequence that passes the test in the
+     *         specified predicate function.
+     */
+    public static <TSource> TSource last(Iterable<TSource> source, Function<TSource, Boolean> predicate)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (predicate == null)
+        {
+            throw new IllegalArgumentException("predicate is null.");
+        }
+
+        Iterator<TSource> iterator = source.iterator();
+        if (iterator.hasNext() == false)
+        {
+            throw new IllegalStateException("The source sequence is empty.");
+        }
+
+        TSource item = null;
+        boolean hasMatched = false;
+        do
+        {
+            TSource current = iterator.next();
+            if (predicate.apply(current))
+            {
+                hasMatched = true;
+                item = current;
+            }
+        }
+        while (iterator.hasNext());
+
+        if (hasMatched)
+        {
+            return item;
+        }
+
+        throw new IllegalStateException("No element satisfies the condition in predicate.");
+    }
+
+    /**
+     * Returns the last element of a sequence, or a default value if the
+     * sequence contains no elements.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            The {@link Iterable} of which to return the last element.
+     * @return <code>null</code> if <code>source</code> is empty; otherwise, the
+     *         last element in the {@link Iterable}.
+     */
+    public static <TSource> TSource lastOrDefault(Iterable<TSource> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        Iterator<TSource> iterator = source.iterator();
+        if (iterator.hasNext() == false)
+        {
+            return null;
+        }
+
+        if (source instanceof List<?>)
+        {
+            List<TSource> sourceList = (List<TSource>) source;
+            return sourceList.get(sourceList.size() - 1);
+        }
+
+        TSource item = null;
+        do
+        {
+            item = iterator.next();
+        }
+        while (iterator.hasNext());
+
+        return item;
+    }
+
+    /**
+     * Returns the last element of the sequence that satisfies a condition or a
+     * default value if no such element is found.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            The {@link Iterable} of which to return the last element.
+     * @param predicate
+     *            A function to test each element for a condition.
+     * @return <code>null</code> if <code>source</code> is empty or if no
+     *         element passes the test specified by <code>predicate</code>;
+     *         otherwise, the last element in <code>source</code> that passes
+     *         the test specified by <code>predicate</code>.
+     */
+    public static <TSource> TSource lastOrDefault(Iterable<TSource> source, Function<TSource, Boolean> predicate)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (predicate == null)
+        {
+            throw new IllegalArgumentException("predicate is null.");
+        }
+
+        Iterator<TSource> iterator = source.iterator();
+        if (iterator.hasNext() == false)
+        {
+            return null;
+        }
+
+        TSource item = null;
+        do
+        {
+            TSource current = iterator.next();
+            if (predicate.apply(current))
+            {
+                item = current;
+            }
+        }
+        while (iterator.hasNext());
+
+        return item;
+    }
+
+    // endregion
+
     // region: To Collection
 
     /**
