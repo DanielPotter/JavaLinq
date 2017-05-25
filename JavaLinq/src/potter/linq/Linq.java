@@ -917,6 +917,68 @@ public class Linq
 
     // endregion
 
+    // region: Sequence Equal
+
+    /**
+     * Determines whether two sequences are equal by comparing the elements by
+     * using the default equality comparer for their type.
+     *
+     * @param <TSource>
+     *            The type of the elements of the input sequences.
+     * @param first
+     *            An {@link Iterable} to compare to second.
+     * @param second
+     *            An {@link Iterable} to compare to the first sequence.
+     * @return <code>true</code> if the two source sequences are of equal length
+     *         and their corresponding elements are equal according to the
+     *         default equality comparer for their type; otherwise,
+     *         <code>false</code>.
+     */
+    public static <TSource> boolean sequenceEqual(Iterable<TSource> first, Iterable<TSource> second)
+    {
+        if (first == null)
+        {
+            throw new IllegalArgumentException("first is null.");
+        }
+        if (second == null)
+        {
+            throw new IllegalArgumentException("second is null.");
+        }
+
+        Iterator<TSource> firstIterator = first.iterator();
+        Iterator<TSource> secondIterator = second.iterator();
+
+        while (firstIterator.hasNext())
+        {
+            if (secondIterator.hasNext() == false)
+            {
+                return false;
+            }
+
+            TSource firstItem = firstIterator.next();
+            TSource secondItem = secondIterator.next();
+
+            if (firstItem == null)
+            {
+                if (secondItem == null)
+                {
+                    continue;
+                }
+
+                return false;
+            }
+
+            if (firstItem.equals(secondItem) == false)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // endregion
+
     // region: To Collection
 
     /**

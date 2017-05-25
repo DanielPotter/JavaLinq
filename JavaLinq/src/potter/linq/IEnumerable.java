@@ -288,6 +288,26 @@ public interface IEnumerable<T> extends Iterable<T>
 
     // endregion
 
+    // region: Sequence Equal
+
+    /**
+     * Determines whether two sequences are equal by comparing the elements by
+     * using the default equality comparer for their type.
+     *
+     * @param second
+     *            An {@link Iterable} to compare to the first sequence.
+     * @return <code>true</code> if the two source sequences are of equal length
+     *         and their corresponding elements are equal according to the
+     *         default equality comparer for their type; otherwise,
+     *         <code>false</code>.
+     */
+    default boolean sequenceEqual(Iterable<T> second)
+    {
+        return Linq.sequenceEqual(this, second);
+    }
+
+    // endregion
+
     // region: To Collection
 
     /**
