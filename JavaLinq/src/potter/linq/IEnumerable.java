@@ -308,6 +308,63 @@ public interface IEnumerable<T> extends Iterable<T>
 
     // endregion
 
+    // region: Single
+
+    /**
+     * Returns the only element of a sequence, and throws an exception if there
+     * is not exactly one element in the sequence.
+     *
+     * @return The single element of the input sequence.
+     */
+    default T single()
+    {
+        return Linq.single(this);
+    }
+
+    /**
+     * Returns the only element of a sequence that satisfies a specified
+     * condition, and throws an exception if more than one such element exists.
+     *
+     * @param predicate
+     *            A function to test an element for a condition.
+     * @return The single element of the input sequence that satisfies a
+     *         condition.
+     */
+    default T single(Function<T, Boolean> predicate)
+    {
+        return Linq.single(this, predicate);
+    }
+
+    /**
+     * Returns the only element of a sequence, or a default value if the
+     * sequence is empty; this method throws an exception if there is more than
+     * one element in the sequence.
+     *
+     * @return The single element of the input sequence, or <code>null</code> if
+     *         the sequence contains no elements.
+     */
+    default T singleOrDefault()
+    {
+        return Linq.singleOrDefault(this);
+    }
+
+    /**
+     * Returns the only element of a sequence that satisfies a specified
+     * condition or a default value if no such element exists; this method
+     * throws an exception if more than one element satisfies the condition.
+     *
+     * @param predicate
+     *            A function to test an element for a condition.
+     * @return The single element of the input sequence that satisfies the
+     *         condition, or <code>null</code> if no such element is found.
+     */
+    default T singleOrDefault(Function<T, Boolean> predicate)
+    {
+        return Linq.singleOrDefault(this, predicate);
+    }
+
+    // endregion
+
     // region: To Collection
 
     /**

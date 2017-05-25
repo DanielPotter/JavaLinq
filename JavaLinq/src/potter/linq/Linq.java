@@ -979,6 +979,199 @@ public class Linq
 
     // endregion
 
+    // region: Single
+
+    /**
+     * Returns the only element of a sequence, and throws an exception if there
+     * is not exactly one element in the sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} of which to return the single element.
+     * @return The single element of the input sequence.
+     */
+    public static <TSource> TSource single(Iterable<TSource> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        Iterator<TSource> iterator = source.iterator();
+
+        if (iterator.hasNext() == false)
+        {
+            throw new IllegalStateException("The input sequence is empty.");
+        }
+
+        TSource item = iterator.next();
+
+        if (iterator.hasNext())
+        {
+            throw new IllegalStateException("The input sequence contains more than one element.");
+        }
+
+        return item;
+    }
+
+    /**
+     * Returns the only element of a sequence that satisfies a specified
+     * condition, and throws an exception if more than one such element exists.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} from which to return a single element.
+     * @param predicate
+     *            A function to test an element for a condition.
+     * @return The single element of the input sequence that satisfies a
+     *         condition.
+     */
+    public static <TSource> TSource single(Iterable<TSource> source, Function<TSource, Boolean> predicate)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (predicate == null)
+        {
+            throw new IllegalArgumentException("predicate is null.");
+        }
+
+        Iterator<TSource> iterator = source.iterator();
+
+        if (iterator.hasNext() == false)
+        {
+            throw new IllegalStateException("The source sequence is empty.");
+        }
+
+        TSource current, item = null;
+        boolean hasBeenFound = false;
+
+        do
+        {
+            current = iterator.next();
+            if (predicate.apply(current))
+            {
+                if (hasBeenFound)
+                {
+                    throw new IllegalStateException(
+                        "More than one element satisfies the condition in predicate.");
+                }
+
+                item = current;
+                hasBeenFound = true;
+            }
+        }
+        while (iterator.hasNext());
+
+        if (hasBeenFound == false)
+        {
+            throw new IllegalStateException("No element satisfies the condition in predicate.");
+        }
+
+        return item;
+    }
+
+    /**
+     * Returns the only element of a sequence, or a default value if the
+     * sequence is empty; this method throws an exception if there is more than
+     * one element in the sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} of which to return the single element.
+     * @return The single element of the input sequence, or <code>null</code> if
+     *         the sequence contains no elements.
+     */
+    public static <TSource> TSource singleOrDefault(Iterable<TSource> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        Iterator<TSource> iterator = source.iterator();
+
+        if (iterator.hasNext() == false)
+        {
+            return null;
+        }
+
+        TSource item = iterator.next();
+
+        if (iterator.hasNext())
+        {
+            throw new IllegalStateException("The input sequence contains more than one element.");
+        }
+
+        return item;
+    }
+
+    /**
+     * Returns the only element of a sequence that satisfies a specified
+     * condition or a default value if no such element exists; this method
+     * throws an exception if more than one element satisfies the condition.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} from which to return a single element.
+     * @param predicate
+     *            A function to test an element for a condition.
+     * @return The single element of the input sequence that satisfies the
+     *         condition, or <code>null</code> if no such element is found.
+     */
+    public static <TSource> TSource singleOrDefault(Iterable<TSource> source, Function<TSource, Boolean> predicate)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (predicate == null)
+        {
+            throw new IllegalArgumentException("predicate is null.");
+        }
+
+        Iterator<TSource> iterator = source.iterator();
+
+        if (iterator.hasNext() == false)
+        {
+            return null;
+        }
+
+        TSource current, item = null;
+        boolean hasBeenFound = false;
+
+        do
+        {
+            current = iterator.next();
+            if (predicate.apply(current))
+            {
+                if (hasBeenFound)
+                {
+                    throw new IllegalStateException(
+                        "More than one element satisfies the condition in predicate.");
+                }
+
+                item = current;
+                hasBeenFound = true;
+            }
+        }
+        while (iterator.hasNext());
+
+        if (hasBeenFound == false)
+        {
+            return null;
+        }
+
+        return item;
+    }
+
+    // endregion
+
     // region: To Collection
 
     /**
