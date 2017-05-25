@@ -319,6 +319,108 @@ public interface IEnumerable<T> extends Iterable<T>
 
     // endregion
 
+    // region: Skip
+
+    /**
+     * Bypasses a specified number of elements in a sequence and then returns
+     * the remaining elements.
+     *
+     * @param count
+     *            The number of elements to skip before returning the remaining
+     *            elements.
+     * @return An {@link IEnumerable} that contains the elements that occur
+     *         after the specified index in the input sequence.
+     */
+    default IEnumerable<T> skip(int count)
+    {
+        return Linq.skip(this, count);
+    }
+
+    /**
+     * Bypasses elements in a sequence as long as a specified condition is true
+     * and then returns the remaining elements.
+     *
+     * @param predicate
+     *            A function to test each element for a condition.
+     * @return An {@link IEnumerable} that contains the elements from the input
+     *         sequence starting at the first element in the linear series that
+     *         does not pass the test specified by <code>predicate</code>.
+     */
+    default IEnumerable<T> skipWhile(Function<T, Boolean> predicate)
+    {
+        return Linq.skipWhile(this, predicate);
+    }
+
+    /**
+     * Bypasses elements in a sequence as long as a specified condition is true
+     * and then returns the remaining elements. The element's index is used in
+     * the logic of the predicate function.
+     *
+     * @param predicate
+     *            A function to test each source element for a condition; the
+     *            second parameter of the function represents the index of the
+     *            source element.
+     * @return An {@link IEnumerable} that contains the elements from the input
+     *         sequence starting at the first element in the linear series that
+     *         does not pass the test specified by <code>predicate</code>.
+     */
+    default IEnumerable<T> skipWhile(BiFunction<T, Integer, Boolean> predicate)
+    {
+        return Linq.skipWhile(this, predicate);
+    }
+
+    // endregion
+
+    // region: Take
+
+    /**
+     * Returns a specified number of contiguous elements from the start of a
+     * sequence.
+     *
+     * @param count
+     *            The number of elements to return.
+     * @return An {@link IEnumerable} that contains the specified number of
+     *         elements from the start of the input sequence.
+     */
+    default IEnumerable<T> take(int count)
+    {
+        return Linq.take(this, count);
+    }
+
+    /**
+     * Returns elements from a sequence as long as a specified condition is
+     * true.
+     *
+     * @param predicate
+     *            A function to test each element for a condition.
+     * @return An {@link IEnumerable} that contains the elements from the input
+     *         sequence that occur before the element at which the test no
+     *         longer passes.
+     */
+    default IEnumerable<T> takeWhile(Function<T, Boolean> predicate)
+    {
+        return Linq.takeWhile(this, predicate);
+    }
+
+    /**
+     * Returns elements from a sequence as long as a specified condition is
+     * true. The element's index is used in the logic of the predicate function.
+     *
+     * @param predicate
+     *            A function to test each source element for a condition; the
+     *            second parameter of the function represents the index of the
+     *            source element.
+     * @return An {@link IEnumerable} that contains the elements from the input
+     *         sequence that occur before the element at which the test no
+     *         longer passes.
+     */
+    default IEnumerable<T> takeWhile(BiFunction<T, Integer, Boolean> predicate)
+    {
+        return Linq.takeWhile(this, predicate);
+    }
+
+    // endregion
+
     // region: Union
 
     /**

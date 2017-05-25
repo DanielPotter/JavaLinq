@@ -783,6 +783,297 @@ public class Linq
 
     // endregion
 
+    // region: Skip
+
+    /**
+     * Bypasses a specified number of elements in a sequence and then returns
+     * the remaining elements.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} from which to return elements.
+     * @param count
+     *            The number of elements to skip before returning the remaining
+     *            elements.
+     * @return An {@link IEnumerable} that contains the elements that occur
+     *         after the specified index in the input sequence.
+     */
+    public static <TSource> IEnumerable<TSource> skip(Iterable<TSource> source, int count)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new SkipWhileEnumerator<TSource>(source)
+        {
+            @Override
+            public boolean skip(TSource item, int index)
+            {
+                return index < count;
+            }
+        });
+    }
+
+    /**
+     * Bypasses elements in a sequence as long as a specified condition is true
+     * and then returns the remaining elements.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} from which to return elements.
+     * @param predicate
+     *            A function to test each element for a condition.
+     * @return An {@link IEnumerable} that contains the elements from the input
+     *         sequence starting at the first element in the linear series that
+     *         does not pass the test specified by <code>predicate</code>.
+     */
+    public static <TSource> IEnumerable<TSource> skipWhile(Iterable<TSource> source,
+            Function<TSource, Boolean> predicate)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (predicate == null)
+        {
+            throw new IllegalArgumentException("predicate is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new SkipWhileEnumerator<TSource>(source)
+        {
+            @Override
+            public boolean skip(TSource item, int index)
+            {
+                return predicate.apply(item);
+            }
+        });
+    }
+
+    /**
+     * Bypasses elements in a sequence as long as a specified condition is true
+     * and then returns the remaining elements. The element's index is used in
+     * the logic of the predicate function.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} from which to return elements.
+     * @param predicate
+     *            A function to test each source element for a condition; the
+     *            second parameter of the function represents the index of the
+     *            source element.
+     * @return An {@link IEnumerable} that contains the elements from the input
+     *         sequence starting at the first element in the linear series that
+     *         does not pass the test specified by <code>predicate</code>.
+     */
+    public static <TSource> IEnumerable<TSource> skipWhile(Iterable<TSource> source,
+            BiFunction<TSource, Integer, Boolean> predicate)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (predicate == null)
+        {
+            throw new IllegalArgumentException("predicate is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new SkipWhileEnumerator<TSource>(source)
+        {
+            @Override
+            public boolean skip(TSource item, int index)
+            {
+                return predicate.apply(item, index);
+            }
+        });
+    }
+
+    private static abstract class SkipWhileEnumerator<TSource> extends SimpleIterator<TSource>
+    {
+        public SkipWhileEnumerator(Iterable<TSource> source)
+        {
+            sourceIterator = source.iterator();
+        }
+
+        private Iterator<TSource> sourceIterator;
+        private int index;
+        private boolean hasSkipped;
+
+        @Override
+        public boolean moveNext()
+        {
+            if (hasSkipped == false)
+            {
+                hasSkipped = true;
+
+                while (sourceIterator.hasNext())
+                {
+                    TSource current = sourceIterator.next();
+                    if (skip(current, index++) == false)
+                    {
+                        setCurrent(current);
+                        return true;
+                    }
+                }
+            }
+
+            if (sourceIterator.hasNext())
+            {
+                setCurrent(sourceIterator.next());
+                return true;
+            }
+
+            return false;
+        }
+
+        public abstract boolean skip(TSource item, int index);
+    }
+
+    // endregion
+
+    // region: Take
+
+    /**
+     * Returns a specified number of contiguous elements from the start of a
+     * sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            The sequence from which to return elements.
+     * @param count
+     *            The number of elements to return.
+     * @return An {@link IEnumerable} that contains the specified number of
+     *         elements from the start of the input sequence.
+     */
+    public static <TSource> IEnumerable<TSource> take(Iterable<TSource> source, int count)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new TakeWhileEnumerator<TSource>(source)
+        {
+            @Override
+            public boolean take(TSource item, int index)
+            {
+                return index < count;
+            }
+        });
+    }
+
+    /**
+     * Returns elements from a sequence as long as a specified condition is
+     * true.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            The sequence from which to return elements.
+     * @param predicate
+     *            A function to test each element for a condition.
+     * @return An {@link IEnumerable} that contains the elements from the input
+     *         sequence that occur before the element at which the test no
+     *         longer passes.
+     */
+    public static <TSource> IEnumerable<TSource> takeWhile(Iterable<TSource> source,
+            Function<TSource, Boolean> predicate)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (predicate == null)
+        {
+            throw new IllegalArgumentException("predicate is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new TakeWhileEnumerator<TSource>(source)
+        {
+            @Override
+            public boolean take(TSource item, int index)
+            {
+                return predicate.apply(item);
+            }
+        });
+    }
+
+    /**
+     * Returns elements from a sequence as long as a specified condition is
+     * true. The element's index is used in the logic of the predicate function.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            The sequence from which to return elements.
+     * @param predicate
+     *            A function to test each source element for a condition; the
+     *            second parameter of the function represents the index of the
+     *            source element.
+     * @return An {@link IEnumerable} that contains the elements from the input
+     *         sequence that occur before the element at which the test no
+     *         longer passes.
+     */
+    public static <TSource> IEnumerable<TSource> takeWhile(Iterable<TSource> source,
+            BiFunction<TSource, Integer, Boolean> predicate)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (predicate == null)
+        {
+            throw new IllegalArgumentException("predicate is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new TakeWhileEnumerator<TSource>(source)
+        {
+            @Override
+            public boolean take(TSource item, int index)
+            {
+                return predicate.apply(item, index);
+            }
+        });
+    }
+
+    private static abstract class TakeWhileEnumerator<TSource> extends SimpleIterator<TSource>
+    {
+        public TakeWhileEnumerator(Iterable<TSource> source)
+        {
+            sourceIterator = source.iterator();
+        }
+
+        private Iterator<TSource> sourceIterator;
+        private int index;
+        private boolean isTaking = true;
+
+        @Override
+        public boolean moveNext()
+        {
+            if (isTaking && sourceIterator.hasNext())
+            {
+                TSource item = sourceIterator.next();
+                if (take(item, index++))
+                {
+                    setCurrent(item);
+                    return true;
+                }
+
+                isTaking = false;
+            }
+
+            return false;
+        }
+
+        public abstract boolean take(TSource item, int index);
+    }
+
+    // endregion
+
     // region: Union
 
     /**
