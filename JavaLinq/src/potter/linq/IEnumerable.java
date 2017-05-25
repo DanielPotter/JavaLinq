@@ -239,6 +239,40 @@ public interface IEnumerable<T> extends Iterable<T>
 
     // endregion
 
+    // region: Of Type
+
+    /**
+     * Filters the elements of an {@link Iterable} based on a specified type.
+     *
+     * @param <TResult>
+     *            The type on which to filter the elements of the sequence.
+     * @param type
+     *            The type of elements to filter
+     * @return An {@link Iterable} that contains elements from the input
+     *         sequence of type <code>type</code>.
+     */
+    default <TResult> IEnumerable<TResult> ofType(Class<TResult> type)
+    {
+        return Linq.ofType(this, type);
+    }
+
+    // endregion
+
+    // region: Reverse
+
+    /**
+     * Inverts the order of the elements in a sequence.
+     *
+     * @return A sequence whose elements correspond to those of the input
+     *         sequence in reverse order.
+     */
+    default IEnumerable<T> reverse()
+    {
+        return Linq.reverse(this);
+    }
+
+    // endregion
+
     // region: Select
 
     /**

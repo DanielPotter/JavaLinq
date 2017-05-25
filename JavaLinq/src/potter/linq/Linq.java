@@ -570,6 +570,119 @@ public class Linq
 
     // endregion
 
+    // region: Of Type
+
+    /**
+     * Filters the elements of an {@link Iterable} based on a specified type.
+     *
+     * @param <TResult>
+     *            The type on which to filter the elements of the sequence.
+     * @param source
+     *            The {@link Iterable} whose elements to filter.
+     * @param type
+     *            The type of elements to filter
+     * @return An {@link Iterable} that contains elements from the input
+     *         sequence of type <code>type</code>.
+     */
+    public static <TResult> IEnumerable<TResult> ofType(Iterable<?> source, Class<TResult> type)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (type == null)
+        {
+            throw new IllegalArgumentException("type is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new OfTypeIterator<>(source, type));
+    }
+
+    private static class OfTypeIterator<TResult> extends SimpleIterator<TResult>
+    {
+        public OfTypeIterator(Iterable<?> source, Class<TResult> type)
+        {
+            sourceIterator = source.iterator();
+            this.type = type;
+        }
+
+        private Iterator<?> sourceIterator;
+        private Class<TResult> type;
+
+        @Override
+        public boolean moveNext()
+        {
+            while (sourceIterator.hasNext())
+            {
+                Object input = sourceIterator.next();
+                if (type.isInstance(input))
+                {
+                    TResult currentValue = type.cast(input);
+                    setCurrent(currentValue);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    // endregion
+
+    // region: Reverse
+
+    /**
+     * Inverts the order of the elements in a sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            A sequence of values to reverse.
+     * @return A sequence whose elements correspond to those of the input
+     *         sequence in reverse order.
+     */
+    public static <TSource> IEnumerable<TSource> reverse(Iterable<TSource> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new ReverseIterator<>(source));
+    }
+
+    private static class ReverseIterator<TSource> extends SimpleIterator<TSource>
+    {
+        public ReverseIterator(Iterable<TSource> source)
+        {
+            this.source = source;
+        }
+
+        private Iterable<TSource> source;
+        private ArrayList<TSource> items;
+        private int index;
+
+        @Override
+        public boolean moveNext()
+        {
+            if (items == null)
+            {
+                items = toArrayList(source);
+                index = items.size() - 1;
+            }
+
+            if (index >= 0)
+            {
+                setCurrent(items.get(index--));
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    // endregion
+
     // region: Select
 
     /**
