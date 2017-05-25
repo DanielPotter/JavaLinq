@@ -15,6 +15,59 @@ import java.util.function.Function;
  */
 public class Linq
 {
+    // region: Creation
+
+    // region: As Enumerable
+
+    /**
+     * Gets an {@link IEnumerable} that represents a sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} to wrap.
+     * @return An {@link IEnumerable} containing the elements from
+     *         <code>source</code>.
+     */
+    public static <TSource> IEnumerable<TSource> asEnumerable(Iterable<TSource> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        if (source instanceof IEnumerable<?>)
+        {
+            return (IEnumerable<TSource>) source;
+        }
+
+        return new EnumerableAdapter<>(source);
+    }
+
+    /**
+     * Gets an {@link IEnumerable} that represents an array.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An array to wrap.
+     * @return An {@link IEnumerable} containing the elements from
+     *         <code>source</code>.
+     */
+    public static <TSource> IEnumerable<TSource> asEnumerable(TSource[] source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        return new EnumerableArray<>(source);
+    }
+
+    // endregion
+
+    // endregion
+
     // region: Aggregation
 
     // region: All
