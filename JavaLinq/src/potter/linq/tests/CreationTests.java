@@ -139,4 +139,100 @@ public class CreationTests
     }
 
     // endregion
+
+    // region: range(int, int)
+
+    @Test
+    public void range1_zeroToFive_containsElements()
+    {
+        // Arrange
+        ArrayList<Integer> expectedElements = new ArrayList<>();
+        expectedElements.add(0);
+        expectedElements.add(1);
+        expectedElements.add(2);
+        expectedElements.add(3);
+        expectedElements.add(4);
+        expectedElements.add(5);
+
+        // Act
+        IEnumerable<Integer> actualElements = Linq.range(0, 6);
+
+        // Assert
+        CollectionAssert.assertSequenceEquals(expectedElements, actualElements);
+    }
+
+    @Test
+    public void range1_fiveToTen_containsElements()
+    {
+        // Arrange
+        ArrayList<Integer> expectedElements = new ArrayList<>();
+        expectedElements.add(5);
+        expectedElements.add(6);
+        expectedElements.add(7);
+        expectedElements.add(8);
+        expectedElements.add(9);
+        expectedElements.add(10);
+
+        // Act
+        IEnumerable<Integer> actualElements = Linq.range(5, 6);
+
+        // Assert
+        CollectionAssert.assertSequenceEquals(expectedElements, actualElements);
+    }
+
+    @Test
+    public void range1_iterateTwice_containsElements()
+    {
+        // Arrange
+        ArrayList<Integer> expectedElements = new ArrayList<>();
+        expectedElements.add(1);
+        expectedElements.add(2);
+        expectedElements.add(3);
+        expectedElements.add(4);
+        expectedElements.add(5);
+
+        // Act
+        IEnumerable<Integer> actualElements = Linq.range(1, 5);
+
+        // Assert
+        CollectionAssert.assertSequenceEquals(expectedElements, actualElements);
+        CollectionAssert.assertSequenceEquals(expectedElements, actualElements);
+    }
+
+    // endregion
+
+    // region: repeat(TResult, int)
+
+    @Test
+    public void repeat1_zero_containsNoElements()
+    {
+        // Arrange
+        ArrayList<Integer> expectedElements = new ArrayList<>();
+
+        // Act
+        IEnumerable<Integer> actualElements = Linq.repeat(42, 0);
+
+        // Assert
+        CollectionAssert.assertSequenceEquals(expectedElements, actualElements);
+    }
+
+    @Test
+    public void repeat1_five_containsElements()
+    {
+        // Arrange
+        ArrayList<Integer> expectedElements = new ArrayList<>();
+        expectedElements.add(42);
+        expectedElements.add(42);
+        expectedElements.add(42);
+        expectedElements.add(42);
+        expectedElements.add(42);
+
+        // Act
+        IEnumerable<Integer> actualElements = Linq.repeat(42, 5);
+
+        // Assert
+        CollectionAssert.assertSequenceEquals(expectedElements, actualElements);
+    }
+
+    // endregion
 }

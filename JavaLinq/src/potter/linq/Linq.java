@@ -146,6 +146,88 @@ public class Linq
 
     // endregion
 
+    // region: Range
+
+    /**
+     * Generates a sequence of integral numbers within a specified range.
+     *
+     * @param start
+     *            The value of the first integer in the sequence.
+     * @param count
+     *            The number of sequential integers to generate.
+     * @return An {@link IEnumerable} that contains a range of sequential
+     *         integral numbers.
+     */
+    public static IEnumerable<Integer> range(int start, int count)
+    {
+        return new EnumerableAdapter<>(() -> new DynamicIterator<Integer>()
+        {
+            private int index = -1;
+
+            @Override
+            public Integer getCurrent()
+            {
+                return start + index;
+            }
+
+            @Override
+            public boolean moveNext()
+            {
+                if (index < count - 1)
+                {
+                    index++;
+                    return true;
+                }
+
+                return false;
+            }
+        });
+    }
+
+    // endregion
+
+    // region: Repeat
+
+    /**
+     * Generates a sequence that contains one repeated value.
+     *
+     * @param <TResult>
+     *            The type of the value to be repeated in the result sequence.
+     * @param element
+     *            The value to be repeated.
+     * @param count
+     *            The number of times to repeat the value in the generated
+     *            sequence.
+     * @return An {@link IEnumerable} that contains a repeated value.
+     */
+    public static <TResult> IEnumerable<TResult> repeat(TResult element, int count)
+    {
+        return new EnumerableAdapter<>(() -> new DynamicIterator<TResult>()
+        {
+            private int index;
+
+            @Override
+            public TResult getCurrent()
+            {
+                return element;
+            }
+
+            @Override
+            public boolean moveNext()
+            {
+                if (index < count)
+                {
+                    index++;
+                    return true;
+                }
+
+                return false;
+            }
+        });
+    }
+
+    // endregion
+
     // endregion
 
     // region: Aggregation
