@@ -74,6 +74,24 @@ public interface IEnumerable<T> extends Iterable<T>
 
     // endregion
 
+    // region: Contains
+
+    /**
+     * Determines whether a sequence contains a specified element by using the
+     * default equality comparer.
+     *
+     * @param value
+     *            The value to locate in the sequence.
+     * @return <code>true</code> if the source sequence contains an element that
+     *         has the specified value; otherwise, <code>false</code>.
+     */
+    default boolean contains(T value)
+    {
+        return Linq.contains(this, value);
+    }
+
+    // endregion
+
     // region: Count
 
     /**

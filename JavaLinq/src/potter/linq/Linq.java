@@ -1,6 +1,7 @@
 package potter.linq;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -322,6 +323,46 @@ public class Linq
         for (TSource item : source)
         {
             if (predicate.apply(item))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // endregion
+
+    // region: Contains
+
+    /**
+     * Determines whether a sequence contains a specified element by using the
+     * default equality comparer.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            A sequence in which to locate a value.
+     * @param value
+     *            The value to locate in the sequence.
+     * @return <code>true</code> if the source sequence contains an element that
+     *         has the specified value; otherwise, <code>false</code>.
+     */
+    public static <TSource> boolean contains(Iterable<TSource> source, TSource value)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        if (source instanceof Collection<?>)
+        {
+            return ((Collection<?>) source).contains(value);
+        }
+
+        for (TSource item : source)
+        {
+            if (value.equals(item))
             {
                 return true;
             }
