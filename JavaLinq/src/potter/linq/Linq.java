@@ -2,6 +2,7 @@ package potter.linq;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -416,6 +417,151 @@ public class Linq
             {
                 setCurrent(secondIterator.next());
                 return true;
+            }
+
+            return false;
+        }
+    }
+
+    // endregion
+
+    // region: Except
+
+    /**
+     * Produces the set difference of two sequences by using the default
+     * equality comparer to compare values.
+     *
+     * @param <TSource>
+     *            The type of the elements of the input sequences.
+     * @param first
+     *            An {@link Iterable} whose elements that are not also in second
+     *            will be returned.
+     * @param second
+     *            An {@link Iterable} whose elements that also occur in the
+     *            first sequence will cause those elements to be removed from
+     *            the returned sequence.
+     * @return A sequence that contains the set difference of the elements of
+     *         two sequences.
+     */
+    public static <TSource> IEnumerable<TSource> except(Iterable<TSource> first, Iterable<TSource> second)
+    {
+        if (first == null)
+        {
+            throw new IllegalArgumentException("first is null.");
+        }
+        if (second == null)
+        {
+            throw new IllegalArgumentException("second is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new ExceptIterator<>(first, second));
+    }
+
+    private static class ExceptIterator<TSource> extends SimpleIterator<TSource>
+    {
+        public ExceptIterator(Iterable<TSource> first, Iterable<TSource> second)
+        {
+            firstIterator = first.iterator();
+            this.second = second;
+        }
+
+        private Iterator<TSource> firstIterator;
+        private Iterable<TSource> second;
+
+        private HashSet<TSource> set;
+
+        @Override
+        public boolean moveNext()
+        {
+            if (set == null)
+            {
+                set = new HashSet<TSource>();
+                for (TSource element : second)
+                {
+                    set.add(element);
+                }
+            }
+
+            while (firstIterator.hasNext())
+            {
+                TSource element = firstIterator.next();
+                if (set.add(element))
+                {
+                    setCurrent(element);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    // endregion
+
+    // region: Intersect
+
+    /**
+     * Produces the set intersection of two sequences by using the default
+     * equality comparer to compare values.
+     *
+     * @param <TSource>
+     *            The type of the elements of the input sequences.
+     * @param first
+     *            An {@link Iterable} whose distinct elements that also appear
+     *            in <code>second</code> will be returned.
+     * @param second
+     *            An {@link Iterable} whose distinct elements that also appear
+     *            in the first sequence will be returned.
+     * @return A sequence that contains the elements that form the set
+     *         intersection of two sequences.
+     */
+    public static <TSource> IEnumerable<TSource> intersect(Iterable<TSource> first, Iterable<TSource> second)
+    {
+        if (first == null)
+        {
+            throw new IllegalArgumentException("first is null.");
+        }
+        if (second == null)
+        {
+            throw new IllegalArgumentException("second is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new IntersectIterator<>(first, second));
+    }
+
+    private static class IntersectIterator<TSource> extends SimpleIterator<TSource>
+    {
+        public IntersectIterator(Iterable<TSource> first, Iterable<TSource> second)
+        {
+            firstIterator = first.iterator();
+            this.second = second;
+        }
+
+        private Iterator<TSource> firstIterator;
+        private Iterable<TSource> second;
+
+        private HashSet<TSource> set;
+
+        @Override
+        public boolean moveNext()
+        {
+            if (set == null)
+            {
+                set = new HashSet<TSource>();
+                for (TSource element : second)
+                {
+                    set.add(element);
+                }
+            }
+
+            while (firstIterator.hasNext())
+            {
+                TSource element = firstIterator.next();
+                if (set.remove(element))
+                {
+                    setCurrent(element);
+                    return true;
+                }
             }
 
             return false;

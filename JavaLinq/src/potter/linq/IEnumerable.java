@@ -200,6 +200,45 @@ public interface IEnumerable<T> extends Iterable<T>
 
     // endregion
 
+    // region: Except
+
+    /**
+     * Produces the set difference of two sequences by using the default
+     * equality comparer to compare values.
+     *
+     * @param second
+     *            An {@link Iterable} whose elements that also occur in the
+     *            first sequence will cause those elements to be removed from
+     *            the returned sequence.
+     * @return A sequence that contains the set difference of the elements of
+     *         two sequences.
+     */
+    default IEnumerable<T> except(Iterable<T> second)
+    {
+        return Linq.except(this, second);
+    }
+
+    // endregion
+
+    // region: Intersect
+
+    /**
+     * Produces the set intersection of two sequences by using the default
+     * equality comparer to compare values.
+     *
+     * @param second
+     *            An {@link Iterable} whose distinct elements that also appear
+     *            in the first sequence will be returned.
+     * @return A sequence that contains the elements that form the set
+     *         intersection of two sequences.
+     */
+    default IEnumerable<T> intersect(Iterable<T> second)
+    {
+        return Linq.intersect(this, second);
+    }
+
+    // endregion
+
     // region: Select
 
     /**
