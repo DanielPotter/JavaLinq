@@ -102,4 +102,41 @@ public class CreationTests
     }
 
     // endregion
+
+    // region: empty(Class<TResult>)
+
+    @Test(expected = IllegalArgumentException.class)
+    public void empty1_nullType_throwsException()
+    {
+        Linq.empty((Class<Object>) null);
+    }
+
+    @Test
+    public void empty1_validType_containsNoElements()
+    {
+        // Arrange
+        ArrayList<Integer> expectedElements = new ArrayList<>();
+
+        // Act
+        IEnumerable<Integer> actualElements = Linq.empty(Integer.class);
+
+        // Assert
+        CollectionAssert.assertSequenceEquals(expectedElements, actualElements);
+    }
+
+    @Test
+    public void empty1_iterateTwice_containsNoElements()
+    {
+        // Arrange
+        ArrayList<Integer> expectedElements = new ArrayList<>();
+
+        // Act
+        IEnumerable<Integer> actualElements = Linq.empty(Integer.class);
+
+        // Assert
+        CollectionAssert.assertSequenceEquals(expectedElements, actualElements);
+        CollectionAssert.assertSequenceEquals(expectedElements, actualElements);
+    }
+
+    // endregion
 }

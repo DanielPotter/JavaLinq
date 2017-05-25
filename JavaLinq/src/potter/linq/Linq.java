@@ -66,6 +66,86 @@ public class Linq
 
     // endregion
 
+    // region: Empty
+
+    /**
+     * Returns an empty {@link IEnumerable} that has the specified type
+     * argument.
+     *
+     * @param <TResult>
+     *            The type to assign to the type parameter of the returned
+     *            generic {@link IEnumerable}.
+     * @param type
+     *            The type to assign to the type parameter of the returned
+     *            generic {@link IEnumerable}.
+     * @return An empty {@link IEnumerable} whose type argument is
+     *         <code>TResult</code>.
+     */
+    public static <TResult> IEnumerable<TResult> empty(Class<TResult> type)
+    {
+        if (type == null)
+        {
+            throw new IllegalArgumentException("type is null.");
+        }
+
+        return EmptyEnumerable.getInstance(type);
+    }
+
+    private static class EmptyEnumerable<TElement> implements IEnumerable<TElement>
+    {
+        @SuppressWarnings("rawtypes")
+        private static HashMap<Class, IEnumerable> cachedEnumerables = new HashMap<Class, IEnumerable>();
+
+        public static <TElement> IEnumerable<TElement> getInstance(Class<TElement> type)
+        {
+            @SuppressWarnings("unchecked")
+            IEnumerable<TElement> enumerable = cachedEnumerables.get(type);
+
+            if (enumerable == null)
+            {
+                enumerable = new EmptyEnumerable<TElement>();
+                cachedEnumerables.put(type, enumerable);
+            }
+
+            return enumerable;
+        }
+
+        @Override
+        public Iterator<TElement> iterator()
+        {
+            return new EmptyEnumerator<>();
+        }
+
+        private static class EmptyEnumerator<TElement> implements IEnumerator<TElement>
+        {
+            @Override
+            public boolean hasNext()
+            {
+                return false;
+            }
+
+            @Override
+            public TElement next()
+            {
+                return null;
+            }
+
+            @Override
+            public TElement getCurrent()
+            {
+                return null;
+            }
+
+            @Override
+            public boolean moveNext()
+            {
+                return false;
+            }
+        }
+    }
+
+    // endregion
+
     // endregion
 
     // region: Aggregation
