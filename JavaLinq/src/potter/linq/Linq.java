@@ -364,6 +364,66 @@ public class Linq
 
     // region: Mutation
 
+    // region: Concat
+
+    /**
+     * Concatenates two sequences.
+     *
+     * @param <TSource>
+     *            The type of the elements of the input sequences.
+     * @param first
+     *            The first sequence to concatenate.
+     * @param second
+     *            The sequence to concatenate to the first sequence.
+     * @return An {@link Iterable} that contains the concatenated elements of
+     *         the two input sequences.
+     */
+    public static <TSource> IEnumerable<TSource> concat(Iterable<TSource> first, Iterable<TSource> second)
+    {
+        if (first == null)
+        {
+            throw new IllegalArgumentException("first is null.");
+        }
+        if (second == null)
+        {
+            throw new IllegalArgumentException("second is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new ConcatIterator<>(first, second));
+    }
+
+    private static class ConcatIterator<TSource> extends SimpleIterator<TSource>
+    {
+        public ConcatIterator(Iterable<TSource> first, Iterable<TSource> second)
+        {
+            firstIterator = first.iterator();
+            secondIterator = second.iterator();
+        }
+
+        private Iterator<TSource> firstIterator;
+        private Iterator<TSource> secondIterator;
+
+        @Override
+        public boolean moveNext()
+        {
+            if (firstIterator.hasNext())
+            {
+                setCurrent(firstIterator.next());
+                return true;
+            }
+
+            if (secondIterator.hasNext())
+            {
+                setCurrent(secondIterator.next());
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    // endregion
+
     // region: Select
 
     /**
@@ -573,6 +633,79 @@ public class Linq
         }
 
         public abstract Iterable<TResult> convert(TSource item, int index);
+    }
+
+    // endregion
+
+    // region: Union
+
+    /**
+     * Produces the set union of two sequences by using the default equality
+     * comparer.
+     *
+     * @param <TSource>
+     *            The type of the elements of the input sequences.
+     * @param first
+     *            An {@link Iterable} whose distinct elements form the first set
+     *            for the union.
+     * @param second
+     *            An {@link Iterable} whose distinct elements form the second
+     *            set for the union.
+     * @return An {@link IEnumerable} that contains the elements from both input
+     *         sequences, excluding duplicates.
+     */
+    public static <TSource> IEnumerable<TSource> union(Iterable<TSource> first, Iterable<TSource> second)
+    {
+        if (first == null)
+        {
+            throw new IllegalArgumentException("first is null.");
+        }
+        if (second == null)
+        {
+            throw new IllegalArgumentException("second is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new UnionIterator<>(first, second));
+    }
+
+    private static class UnionIterator<TSource> extends SimpleIterator<TSource>
+    {
+        public UnionIterator(Iterable<TSource> first, Iterable<TSource> second)
+        {
+            firstIterator = first.iterator();
+            secondIterator = second.iterator();
+        }
+
+        private Iterator<TSource> firstIterator;
+        private Iterator<TSource> secondIterator;
+
+        private HashSet<TSource> set = new HashSet<TSource>();
+
+        @Override
+        public boolean moveNext()
+        {
+            while (firstIterator.hasNext())
+            {
+                TSource element = firstIterator.next();
+                if (set.add(element))
+                {
+                    setCurrent(element);
+                    return true;
+                }
+            }
+
+            while (secondIterator.hasNext())
+            {
+                TSource element = secondIterator.next();
+                if (set.add(element))
+                {
+                    setCurrent(element);
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 
     // endregion

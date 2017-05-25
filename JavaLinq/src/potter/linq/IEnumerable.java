@@ -183,6 +183,23 @@ public interface IEnumerable<T> extends Iterable<T>
 
     // region: Mutation
 
+    // region: Concat
+
+    /**
+     * Concatenates two sequences.
+     *
+     * @param second
+     *            The sequence to concatenate to the first sequence.
+     * @return An {@link Iterable} that contains the concatenated elements of
+     *         the two input sequences.
+     */
+    default IEnumerable<T> concat(Iterable<T> second)
+    {
+        return Linq.concat(this, second);
+    }
+
+    // endregion
+
     // region: Select
 
     /**
@@ -259,6 +276,25 @@ public interface IEnumerable<T> extends Iterable<T>
     default <TResult> IEnumerable<TResult> selectMany(BiFunction<T, Integer, Iterable<TResult>> selector)
     {
         return Linq.selectMany(this, selector);
+    }
+
+    // endregion
+
+    // region: Union
+
+    /**
+     * Produces the set union of two sequences by using the default equality
+     * comparer.
+     *
+     * @param second
+     *            An {@link Iterable} whose distinct elements form the second
+     *            set for the union.
+     * @return An {@link IEnumerable} that contains the elements from both input
+     *         sequences, excluding duplicates.
+     */
+    default IEnumerable<T> union(Iterable<T> second)
+    {
+        return Linq.union(this, second);
     }
 
     // endregion
