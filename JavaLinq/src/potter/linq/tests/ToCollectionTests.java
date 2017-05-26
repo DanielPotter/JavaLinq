@@ -7,23 +7,172 @@ import static potter.linq.tests.CollectionAssert.assertSequenceEquals;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.function.Function;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import potter.linq.Linq;
 
 public class ToCollectionTests
 {
-    // region: toArray
+    // region: toArray(Iterable<?>)
 
     @Test(expected = IllegalArgumentException.class)
-    public void toArray_nullSource_throwsException()
+    public void toArray1_nullSource_throwsException()
+    {
+        Linq.toArray(null);
+    }
+
+    @Test
+    public void toArray1_emptyList_returnsEmptyArray()
+    {
+        // Arrange
+        ArrayList<Integer> source = new ArrayList<Integer>();
+        Object[] expectedArray = new Object[0];
+
+        // Act
+        Object[] actualArray = Linq.toArray(source);
+
+        // Assert
+        Assert.assertArrayEquals(expectedArray, actualArray);
+    }
+
+    @Test
+    public void toArray1_listOfElements_returnsArrayOfElements()
+    {
+        // Arrange
+        ArrayList<Integer> source = new ArrayList<Integer>();
+        source.add(1);
+        source.add(2);
+        source.add(3);
+
+        Object[] expectedArray =
+        {
+            1, 2, 3,
+        };
+
+        // Act
+        Object[] actualArray = Linq.toArray(source);
+
+        // Assert
+        Assert.assertArrayEquals(expectedArray, actualArray);
+    }
+
+    // endregion
+
+    // region: toArray(Iterable<TSource>, TSource[])
+
+    @Test(expected = IllegalArgumentException.class)
+    public void toArray2_nullSource_throwsException()
+    {
+        Linq.toArray(null, new Object[0]);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void toArray2_nullArray_throwsException()
+    {
+        Linq.toArray(new ArrayList<Object>(), (Object[]) null);
+    }
+
+    @Test
+    public void toArray2_emptyList_returnsEmptyArray()
+    {
+        // Arrange
+        ArrayList<Integer> source = new ArrayList<Integer>();
+        Integer[] expectedArray = new Integer[0];
+
+        // Act
+        Integer[] actualArray = Linq.toArray(source, new Integer[0]);
+
+        // Assert
+        Assert.assertArrayEquals(expectedArray, actualArray);
+    }
+
+    @Test
+    public void toArray2_listOfElements_returnsArrayOfElements()
+    {
+        // Arrange
+        ArrayList<Integer> source = new ArrayList<Integer>();
+        source.add(1);
+        source.add(2);
+        source.add(3);
+
+        Integer[] expectedArray =
+        {
+            1, 2, 3,
+        };
+
+        // Act
+        Integer[] actualArray = Linq.toArray(source, new Integer[3]);
+
+        // Assert
+        Assert.assertArrayEquals(expectedArray, actualArray);
+    }
+
+    // endregion
+
+    // region: toArray(Iterable<TSource>, Function<Integer, TSource[]>)
+
+    @Test(expected = IllegalArgumentException.class)
+    public void toArray3_nullSource_throwsException()
+    {
+        Linq.toArray(null, size -> null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void toArray3_nullSelector_throwsException()
+    {
+        Linq.toArray(new ArrayList<Object>(), (Function<Integer, Object[]>) null);
+    }
+
+    @Test
+    public void toArray3_emptyList_returnsEmptyArray()
+    {
+        // Arrange
+        ArrayList<Integer> source = new ArrayList<Integer>();
+        Integer[] expectedArray = new Integer[0];
+
+        // Act
+        Integer[] actualArray = Linq.toArray(source, size -> new Integer[size]);
+
+        // Assert
+        Assert.assertArrayEquals(expectedArray, actualArray);
+    }
+
+    @Test
+    public void toArray3_listOfElements_returnsArrayOfElements()
+    {
+        // Arrange
+        ArrayList<Integer> source = new ArrayList<Integer>();
+        source.add(1);
+        source.add(2);
+        source.add(3);
+
+        Integer[] expectedArray =
+        {
+            1, 2, 3,
+        };
+
+        // Act
+        Integer[] actualArray = Linq.toArray(source, size -> new Integer[size]);
+
+        // Assert
+        Assert.assertArrayEquals(expectedArray, actualArray);
+    }
+
+    // endregion
+
+    // region: toArrayList(Iterable<TSource>)
+
+    @Test(expected = IllegalArgumentException.class)
+    public void toArrayList1_nullSource_throwsException()
     {
         Linq.toArrayList(null);
     }
 
     @Test
-    public void toArray_listOfElements_newListCreated()
+    public void toArrayList1_listOfElements_newListCreated()
     {
         // Arrange
         ArrayList<Integer> expectedList = new ArrayList<>();

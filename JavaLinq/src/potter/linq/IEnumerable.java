@@ -365,7 +365,45 @@ public interface IEnumerable<T> extends Iterable<T>
 
     // endregion
 
-    // region: To Collection
+    // region: To Array
+
+    /**
+     * Creates an array from an {@link Iterable}.
+     *
+     * @return An array that contains the elements from the input sequence.
+     */
+    default Object[] toArray()
+    {
+        return Linq.toArray(this);
+    }
+
+    /**
+     * Creates an array from an {@link Iterable}.
+     *
+     * @param arrayFactory
+     *            Creates an array given the number of elements.
+     * @return An array that contains the elements from the input sequence.
+     */
+    default T[] toArray(Function<Integer, T[]> arrayFactory)
+    {
+        return Linq.toArray(this, arrayFactory);
+    }
+
+    /**
+     * Creates an array from an {@link Iterable}.
+     *
+     * @param array
+     *            The array to fill.
+     * @return An array that contains the elements from the input sequence.
+     */
+    default T[] toArray(T[] array)
+    {
+        return Linq.toArray(this, array);
+    }
+
+    // endregion
+
+    // region: To Array List
 
     /**
      * Creates an array from an {@link Iterable}.
@@ -376,6 +414,10 @@ public interface IEnumerable<T> extends Iterable<T>
     {
         return Linq.toArrayList(this);
     }
+
+    // endregion
+
+    // region: To Hash Map
 
     /**
      * Creates a {@link HashMap} from an {@link Iterable} according to a

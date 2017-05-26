@@ -1172,7 +1172,96 @@ public class Linq
 
     // endregion
 
-    // region: To Collection
+    // region: To Array
+
+    /**
+     * Creates an array from an {@link Iterable}.
+     *
+     * @param source
+     *            An {@link Iterable} from which to create an array.
+     * @return An array that contains the elements from the input sequence.
+     */
+    public static Object[] toArray(Iterable<?> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        ArrayList<?> list = toArrayList(source);
+
+        return list.toArray();
+    }
+
+    /**
+     * Creates an array from an {@link Iterable}.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} from which to create an array.
+     * @param array
+     *            The array to fill.
+     * @return An array that contains the elements from the input sequence.
+     */
+    public static <TSource> TSource[] toArray(Iterable<TSource> source, TSource[] array)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (array == null)
+        {
+            throw new IllegalArgumentException("array is null.");
+        }
+
+        int index = 0;
+        for (TSource element : source)
+        {
+            if (index < array.length)
+            {
+                array[index++] = element;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        return array;
+    }
+
+    /**
+     * Creates an array from an {@link Iterable}.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} from which to create an array.
+     * @param selector
+     *            Creates an array given the number of elements.
+     * @return An array that contains the elements from the input sequence.
+     */
+    public static <TSource> TSource[] toArray(Iterable<TSource> source, Function<Integer, TSource[]> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        ArrayList<TSource> list = toArrayList(source);
+
+        TSource[] newArray = selector.apply(list.size());
+        return list.toArray(newArray);
+    }
+
+    // endregion
+
+    // region: To Array List
 
     /**
      * Creates an array from an {@link Iterable}.
@@ -1198,6 +1287,10 @@ public class Linq
 
         return list;
     }
+
+    // endregion
+
+    // region: To Hash Map
 
     /**
      * Creates a {@link HashMap} from an {@link Iterable} according to a
@@ -1868,7 +1961,7 @@ public class Linq
      *         does not pass the test specified by <code>predicate</code>.
      */
     public static <TSource> IEnumerable<TSource> skipWhile(Iterable<TSource> source,
-            Function<TSource, Boolean> predicate)
+        Function<TSource, Boolean> predicate)
     {
         if (source == null)
         {
@@ -1907,7 +2000,7 @@ public class Linq
      *         does not pass the test specified by <code>predicate</code>.
      */
     public static <TSource> IEnumerable<TSource> skipWhile(Iterable<TSource> source,
-            BiFunction<TSource, Integer, Boolean> predicate)
+        BiFunction<TSource, Integer, Boolean> predicate)
     {
         if (source == null)
         {
@@ -2018,7 +2111,7 @@ public class Linq
      *         longer passes.
      */
     public static <TSource> IEnumerable<TSource> takeWhile(Iterable<TSource> source,
-            Function<TSource, Boolean> predicate)
+        Function<TSource, Boolean> predicate)
     {
         if (source == null)
         {
@@ -2056,7 +2149,7 @@ public class Linq
      *         longer passes.
      */
     public static <TSource> IEnumerable<TSource> takeWhile(Iterable<TSource> source,
-            BiFunction<TSource, Integer, Boolean> predicate)
+        BiFunction<TSource, Integer, Boolean> predicate)
     {
         if (source == null)
         {
