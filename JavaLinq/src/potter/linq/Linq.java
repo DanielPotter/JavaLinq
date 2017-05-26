@@ -234,6 +234,148 @@ public class Linq
 
     // region: Aggregation
 
+    // region: Aggregate
+
+    /**
+     * Applies an accumulator function over a sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} over which to aggregate.
+     * @param function
+     *            An accumulator function to be invoked on each element.
+     * @return The final accumulator value.
+     */
+    public static <TSource> TSource aggregate(Iterable<TSource> source, BiFunction<TSource, TSource, TSource> function)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (function == null)
+        {
+            throw new IllegalArgumentException("function is null.");
+        }
+
+        Iterator<TSource> iterator = source.iterator();
+
+        if (iterator.hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        TSource current = iterator.next();
+        while (iterator.hasNext())
+        {
+            TSource nextItem = iterator.next();
+            current = function.apply(current, nextItem);
+        }
+
+        return current;
+    }
+
+    /**
+     * Applies an accumulator function over a sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TAccumulate>
+     *            The type of the accumulator value.
+     * @param source
+     *            An {@link Iterable} over which to aggregate.
+     * @param seed
+     *            The initial accumulator value.
+     * @param function
+     *            An accumulator function to be invoked on each element.
+     * @return The final accumulator value.
+     */
+    public static <TSource, TAccumulate> TAccumulate aggregate(Iterable<TSource> source, TAccumulate seed,
+        BiFunction<TAccumulate, TSource, TAccumulate> function)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (function == null)
+        {
+            throw new IllegalArgumentException("function is null.");
+        }
+
+        Iterator<TSource> iterator = source.iterator();
+
+        if (iterator.hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        TAccumulate current = seed;
+        do
+        {
+            TSource nextItem = iterator.next();
+            current = function.apply(current, nextItem);
+        }
+        while (iterator.hasNext());
+
+        return current;
+    }
+
+    /**
+     * Applies an accumulator function over a sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TAccumulate>
+     *            The type of the accumulator value.
+     * @param <TResult>
+     *            The type of the resulting value.
+     * @param source
+     *            An {@link Iterable} over which to aggregate.
+     * @param seed
+     *            The initial accumulator value.
+     * @param function
+     *            An accumulator function to be invoked on each element.
+     * @param resultSelector
+     *            A function to transform the final accumulator value into the
+     *            result value.
+     * @return The transformed final accumulator value.
+     */
+    public static <TSource, TAccumulate, TResult> TResult aggregate(Iterable<TSource> source, TAccumulate seed,
+        BiFunction<TAccumulate, TSource, TAccumulate> function, Function<TAccumulate, TResult> resultSelector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (function == null)
+        {
+            throw new IllegalArgumentException("function is null.");
+        }
+        if (resultSelector == null)
+        {
+            throw new IllegalArgumentException("resultSelector is null.");
+        }
+
+        Iterator<TSource> iterator = source.iterator();
+
+        if (iterator.hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        TAccumulate current = seed;
+        do
+        {
+            TSource nextItem = iterator.next();
+            current = function.apply(current, nextItem);
+        }
+        while (iterator.hasNext());
+
+        return resultSelector.apply(current);
+    }
+
+    // endregion
+
     // region: All
 
     /**
@@ -611,7 +753,7 @@ public class Linq
 
     // endregion
 
-    // region : First
+    // region: First
 
     /**
      * Returns the first element of a sequence.

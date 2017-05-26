@@ -28,6 +28,61 @@ public interface IEnumerable<T> extends Iterable<T>
 
     // region: Aggregation
 
+    // region: Aggregate
+
+    /**
+     * Applies an accumulator function over a sequence.
+     *
+     * @param function
+     *            An accumulator function to be invoked on each element.
+     * @return The final accumulator value.
+     */
+    default T aggregate(BiFunction<T, T, T> function)
+    {
+        return Linq.aggregate(this, function);
+    }
+
+    /**
+     * Applies an accumulator function over a sequence.
+     *
+     * @param <TAccumulate>
+     *            The type of the accumulator value.
+     * @param seed
+     *            The initial accumulator value.
+     * @param function
+     *            An accumulator function to be invoked on each element.
+     * @return The final accumulator value.
+     */
+    default <TAccumulate> TAccumulate aggregate(TAccumulate seed,
+        BiFunction<TAccumulate, T, TAccumulate> function)
+    {
+        return Linq.aggregate(this, seed, function);
+    }
+
+    /**
+     * Applies an accumulator function over a sequence.
+     *
+     * @param <TAccumulate>
+     *            The type of the accumulator value.
+     * @param <TResult>
+     *            The type of the resulting value.
+     * @param seed
+     *            The initial accumulator value.
+     * @param function
+     *            An accumulator function to be invoked on each element.
+     * @param resultSelector
+     *            A function to transform the final accumulator value into the
+     *            result value.
+     * @return The transformed final accumulator value.
+     */
+    default <TAccumulate, TResult> TResult aggregate(TAccumulate seed,
+        BiFunction<TAccumulate, T, TAccumulate> function, Function<TAccumulate, TResult> resultSelector)
+    {
+        return Linq.aggregate(this, seed, function, resultSelector);
+    }
+
+    // endregion
+
     // region: All
 
     /**
@@ -176,7 +231,7 @@ public interface IEnumerable<T> extends Iterable<T>
 
     // endregion
 
-    // region : First
+    // region: First
 
     /**
      * Returns the first element of a sequence.
