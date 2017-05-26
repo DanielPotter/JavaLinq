@@ -295,6 +295,76 @@ public class Linq
 
     // endregion
 
+    // region: Distinct
+
+    /**
+     * Returns distinct elements from a sequence by using the default equality
+     * comparer to compare values.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            The sequence from which to remove duplicate elements.
+     * @return An {@link IEnumerable} that contains distinct elements from the
+     *         source sequence.
+     */
+    public static <TSource> IEnumerable<TSource> distinct(Iterable<TSource> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new DistinctIterator<>(source));
+    }
+
+    private static class DistinctIterator<TSource> extends SimpleIterator<TSource>
+    {
+        public DistinctIterator(Iterable<TSource> source)
+        {
+            this.source = source;
+
+            reset();
+        }
+
+        private final Iterable<TSource> source;
+
+        private Iterator<TSource> sourceIterator;
+        private HashSet<TSource> set;
+
+        public void reset()
+        {
+            sourceIterator = source.iterator();
+
+            if (set == null)
+            {
+                set = new HashSet<>();
+            }
+            else
+            {
+                set.clear();
+            }
+        }
+
+        @Override
+        public boolean moveNext()
+        {
+            while (sourceIterator.hasNext())
+            {
+                TSource element = sourceIterator.next();
+                if (set.add(element))
+                {
+                    setCurrent(element);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    // endregion
+
     // region: Except
 
     /**

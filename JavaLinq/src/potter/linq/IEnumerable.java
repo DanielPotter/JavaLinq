@@ -46,6 +46,22 @@ public interface IEnumerable<T> extends Iterable<T>
 
     // endregion
 
+    // region: Distinct
+
+    /**
+     * Returns distinct elements from a sequence by using the default equality
+     * comparer to compare values.
+     *
+     * @return An {@link IEnumerable} that contains distinct elements from the
+     *         source sequence.
+     */
+    default IEnumerable<T> distinct(Iterable<T> source)
+    {
+        return Linq.distinct(this);
+    }
+
+    // endregion
+
     // region: Except
 
     /**
