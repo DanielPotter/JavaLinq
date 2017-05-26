@@ -147,59 +147,6 @@ public interface IEnumerable<T> extends Iterable<T>
 
     // endregion
 
-    // region: Count
-
-    /**
-     * Returns the number of elements in a sequence.
-     *
-     * @return The number of elements in the input sequence.
-     */
-    default int count()
-    {
-        return Linq.count(this);
-    }
-
-    /**
-     * Returns a number that represents how many elements in the specified
-     * sequence satisfy a condition.
-     *
-     * @param predicate
-     *            A function to test each element for a condition.
-     * @return A number that represents how many elements in the sequence
-     *         satisfy the condition in the predicate function.
-     */
-    default int count(Function<T, Boolean> predicate)
-    {
-        return Linq.count(this, predicate);
-    }
-
-    /**
-     * Returns a {@link Long} that represents the total number of elements in a
-     * sequence.
-     *
-     * @return The number of elements in the input sequence.
-     */
-    default long longCount()
-    {
-        return Linq.longCount(this);
-    }
-
-    /**
-     * Returns a {@link Long} that represents how many elements in a sequence
-     * satisfy a condition.
-     *
-     * @param predicate
-     *            A function to test each element for a condition.
-     * @return A number that represents how many elements in the sequence
-     *         satisfy the condition in the predicate function.
-     */
-    default long longCount(Function<T, Boolean> predicate)
-    {
-        return Linq.longCount(this, predicate);
-    }
-
-    // endregion
-
     // region: Element At
 
     /**
@@ -574,6 +521,59 @@ public interface IEnumerable<T> extends Iterable<T>
     default long averageLong(Function<T, Long> selector)
     {
         return Linq.averageLong(this, selector);
+    }
+
+    // endregion
+
+    // region: Count
+
+    /**
+     * Returns the number of elements in a sequence.
+     *
+     * @return The number of elements in the input sequence.
+     */
+    default int count()
+    {
+        return Linq.count(this);
+    }
+
+    /**
+     * Returns a number that represents how many elements in the specified
+     * sequence satisfy a condition.
+     *
+     * @param predicate
+     *            A function to test each element for a condition.
+     * @return A number that represents how many elements in the sequence
+     *         satisfy the condition in the predicate function.
+     */
+    default int count(Function<T, Boolean> predicate)
+    {
+        return Linq.count(this, predicate);
+    }
+
+    /**
+     * Returns a {@link Long} that represents the total number of elements in a
+     * sequence.
+     *
+     * @return The number of elements in the input sequence.
+     */
+    default long longCount()
+    {
+        return Linq.longCount(this);
+    }
+
+    /**
+     * Returns a {@link Long} that represents how many elements in a sequence
+     * satisfy a condition.
+     *
+     * @param predicate
+     *            A function to test each element for a condition.
+     * @return A number that represents how many elements in the sequence
+     *         satisfy the condition in the predicate function.
+     */
+    default long longCount(Function<T, Boolean> predicate)
+    {
+        return Linq.longCount(this, predicate);
     }
 
     // endregion
