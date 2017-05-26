@@ -1,6 +1,7 @@
 package potter.linq;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -348,6 +349,90 @@ public interface IEnumerable<T> extends Iterable<T>
     default IEnumerable<T> where(BiFunction<T, Integer, Boolean> predicate)
     {
         return Linq.where(this, predicate);
+    }
+
+    // endregion
+
+    // endregion
+
+    // region: Sorting
+
+    // region: Order By
+
+    /**
+     * Sorts the elements of a sequence in ascending order according to a key.
+     *
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param keySelector
+     *            A function to extract a key from an element.
+     * @param keyType
+     *            The type of the key that will be compared while ordering.
+     * @return An {@link IOrderedEnumerable} whose elements are sorted according
+     *         to a key.
+     */
+    default <TKey> IOrderedEnumerable<T> orderBy(Function<T, TKey> keySelector, Class<TKey> keyType)
+    {
+        return Linq.orderBy(this, keySelector, keyType);
+    }
+
+    /**
+     * Sorts the elements of a sequence in ascending order by using a specified
+     * comparer.
+     *
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param keySelector
+     *            A function to extract a key from an element.
+     * @param keyType
+     *            The type of the key that will be compared while ordering.
+     * @param comparer
+     *            A {@link Comparator} to compare keys.
+     * @return An {@link IOrderedEnumerable} whose elements are sorted according
+     *         to a key.
+     */
+    default <TKey> IOrderedEnumerable<T> orderBy(Function<T, TKey> keySelector, Class<TKey> keyType,
+        Comparator<TKey> comparer)
+    {
+        return Linq.orderBy(this, keySelector, keyType, comparer);
+    }
+
+    /**
+     * Sorts the elements of a sequence in descending order according to a key.
+     *
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param keySelector
+     *            A function to extract a key from an element.
+     * @param keyType
+     *            The type of the key that will be compared while ordering.
+     * @return An {@link IOrderedEnumerable} whose elements are sorted in
+     *         descending order according to a key.
+     */
+    default <TKey> IOrderedEnumerable<T> orderByDescending(Function<T, TKey> keySelector, Class<TKey> keyType)
+    {
+        return Linq.orderByDescending(this, keySelector, keyType);
+    }
+
+    /**
+     * Sorts the elements of a sequence in descending order by using a specified
+     * comparer.
+     *
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param keySelector
+     *            A function to extract a key from an element.
+     * @param keyType
+     *            The type of the key that will be compared while ordering.
+     * @param comparer
+     *            A {@link Comparator} to compare keys.
+     * @return An {@link IOrderedEnumerable} whose elements are sorted in
+     *         descending order according to a key.
+     */
+    default <TKey> IOrderedEnumerable<T> orderByDescending(Function<T, TKey> keySelector, Class<TKey> keyType,
+        Comparator<TKey> comparer)
+    {
+        return Linq.orderByDescending(this, keySelector, keyType, comparer);
     }
 
     // endregion

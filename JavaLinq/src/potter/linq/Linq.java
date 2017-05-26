@@ -2,6 +2,7 @@ package potter.linq;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -117,32 +118,32 @@ public class Linq
         {
             return new EmptyEnumerator<>();
         }
+    }
 
-        private static class EmptyEnumerator<TElement> implements IEnumerator<TElement>
+    private static class EmptyEnumerator<TElement> implements IEnumerator<TElement>
+    {
+        @Override
+        public boolean hasNext()
         {
-            @Override
-            public boolean hasNext()
-            {
-                return false;
-            }
+            return false;
+        }
 
-            @Override
-            public TElement next()
-            {
-                return null;
-            }
+        @Override
+        public TElement next()
+        {
+            return null;
+        }
 
-            @Override
-            public TElement getCurrent()
-            {
-                return null;
-            }
+        @Override
+        public TElement getCurrent()
+        {
+            return null;
+        }
 
-            @Override
-            public boolean moveNext()
-            {
-                return false;
-            }
+        @Override
+        public boolean moveNext()
+        {
+            return false;
         }
     }
 
@@ -580,8 +581,14 @@ public class Linq
             throw new IllegalArgumentException("selector is null.");
         }
 
-        return new EnumerableAdapter<>(
-            () -> new SelectEnumerator<TSource, TResult>(source, (item, index) -> selector.apply(item)));
+        return new EnumerableAdapter<>(() -> new SelectEnumerator<TSource, TResult>(source)
+        {
+            @Override
+            public TResult select(TSource item, int index)
+            {
+                return selector.apply(item);
+            }
+        });
     }
 
     /**
@@ -613,18 +620,22 @@ public class Linq
             throw new IllegalArgumentException("selector is null.");
         }
 
-        return new EnumerableAdapter<>(() -> new SelectEnumerator<TSource, TResult>(source, selector));
+        return new EnumerableAdapter<>(() -> new SelectEnumerator<TSource, TResult>(source)
+        {
+            @Override
+            public TResult select(TSource item, int index)
+            {
+                return selector.apply(item, index);
+            }
+        });
     }
 
-    private static class SelectEnumerator<TSource, TResult> extends SimpleIterator<TResult>
+    private static abstract class SelectEnumerator<TSource, TResult> extends SimpleIterator<TResult>
     {
-        public SelectEnumerator(Iterable<TSource> source, BiFunction<TSource, Integer, TResult> selector)
+        public SelectEnumerator(Iterable<TSource> source)
         {
-            this.selector = selector;
             sourceIterator = source.iterator();
         }
-
-        private final BiFunction<TSource, Integer, TResult> selector;
 
         private Iterator<TSource> sourceIterator;
         private int index;
@@ -635,13 +646,15 @@ public class Linq
             if (sourceIterator.hasNext())
             {
                 TSource input = sourceIterator.next();
-                TResult currentValue = selector.apply(input, index++);
+                TResult currentValue = select(input, index++);
                 setCurrent(currentValue);
                 return true;
             }
 
             return false;
         }
+
+        public abstract TResult select(TSource item, int index);
     }
 
     // endregion
@@ -1228,6 +1241,474 @@ public class Linq
         }
 
         public abstract boolean include(T item, int index);
+    }
+
+    // endregion
+
+    // endregion
+
+    // region: Sorting
+
+    // region: Order By
+
+    /**
+     * Sorts the elements of a sequence in ascending order according to a key.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param source
+     *            A sequence of values to order.
+     * @param keySelector
+     *            A function to extract a key from an element.
+     * @param keyType
+     *            The type of the key that will be compared while ordering.
+     * @return An {@link IOrderedEnumerable} whose elements are sorted according
+     *         to a key.
+     */
+    public static <TSource, TKey> IOrderedEnumerable<TSource> orderBy(Iterable<TSource> source,
+        Function<TSource, TKey> keySelector, Class<TKey> keyType)
+    {
+        return new KeyedOrderedEnumerable<TSource, TKey>(source, keySelector, keyType, null, false);
+    }
+
+    /**
+     * Sorts the elements of a sequence in ascending order by using a specified
+     * comparer.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param source
+     *            A sequence of values to order.
+     * @param keySelector
+     *            A function to extract a key from an element.
+     * @param keyType
+     *            The type of the key that will be compared while ordering.
+     * @param comparer
+     *            A {@link Comparator} to compare keys.
+     * @return An {@link IOrderedEnumerable} whose elements are sorted according
+     *         to a key.
+     */
+    public static <TSource, TKey> IOrderedEnumerable<TSource> orderBy(Iterable<TSource> source,
+        Function<TSource, TKey> keySelector, Class<TKey> keyType, Comparator<TKey> comparer)
+    {
+        return new KeyedOrderedEnumerable<TSource, TKey>(source, keySelector, keyType, comparer, false);
+    }
+
+    /**
+     * Sorts the elements of a sequence in descending order according to a key.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param source
+     *            A sequence of values to order.
+     * @param keySelector
+     *            A function to extract a key from an element.
+     * @param keyType
+     *            The type of the key that will be compared while ordering.
+     * @return An {@link IOrderedEnumerable} whose elements are sorted in
+     *         descending order according to a key.
+     */
+    public static <TSource, TKey> IOrderedEnumerable<TSource> orderByDescending(Iterable<TSource> source,
+        Function<TSource, TKey> keySelector, Class<TKey> keyType)
+    {
+        return new KeyedOrderedEnumerable<TSource, TKey>(source, keySelector, keyType, null, true);
+    }
+
+    /**
+     * Sorts the elements of a sequence in descending order by using a specified
+     * comparer.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param source
+     *            A sequence of values to order.
+     * @param keySelector
+     *            A function to extract a key from an element.
+     * @param keyType
+     *            The type of the key that will be compared while ordering.
+     * @param comparer
+     *            A {@link Comparator} to compare keys.
+     * @return An {@link IOrderedEnumerable} whose elements are sorted in
+     *         descending order according to a key.
+     */
+    public static <TSource, TKey> IOrderedEnumerable<TSource> orderByDescending(Iterable<TSource> source,
+        Function<TSource, TKey> keySelector, Class<TKey> keyType, Comparator<TKey> comparer)
+    {
+        return new KeyedOrderedEnumerable<TSource, TKey>(source, keySelector, keyType, comparer, true);
+    }
+
+    // endregion
+
+    // region: Then By
+
+    /**
+     * Performs a subsequent ordering of the elements in a sequence in ascending
+     * order according to a key.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param source
+     *            An {@link IOrderedEnumerable} that contains elements to sort.
+     * @param keySelector
+     *            A function to extract a key from each element.
+     * @param keyType
+     *            The type of the key that will be compared while ordering.
+     * @return An {@link IOrderedEnumerable} whose elements are sorted according
+     *         to a key.
+     */
+    public static <TSource, TKey> IOrderedEnumerable<TSource> thenBy(IOrderedEnumerable<TSource> source,
+        Function<TSource, TKey> keySelector, Class<TKey> keyType)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        return source.createOrderedEnumerable(keySelector, keyType, null, false);
+    }
+
+    /**
+     * Performs a subsequent ordering of the elements in a sequence in ascending
+     * order by using a specified comparer.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param source
+     *            An {@link IOrderedEnumerable} that contains elements to sort.
+     * @param keySelector
+     *            A function to extract a key from each element.
+     * @param keyType
+     *            The type of the key that will be compared while ordering.
+     * @param comparer
+     *            A {@link Comparator} to compare keys.
+     * @return An {@link IOrderedEnumerable} whose elements are sorted according
+     *         to a key.
+     */
+    public static <TSource, TKey> IOrderedEnumerable<TSource> thenBy(IOrderedEnumerable<TSource> source,
+        Function<TSource, TKey> keySelector, Class<TKey> keyType, Comparator<TKey> comparer)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        return source.createOrderedEnumerable(keySelector, keyType, comparer, false);
+    }
+
+    /**
+     * Performs a subsequent ordering of the elements in a sequence in
+     * descending order, according to a key.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param source
+     *            An {@link IOrderedEnumerable} that contains elements to sort.
+     * @param keySelector
+     *            A function to extract a key from each element.
+     * @param keyType
+     *            The type of the key that will be compared while ordering.
+     * @return An {@link IOrderedEnumerable} whose elements are sorted in
+     *         descending order according to a key.
+     */
+    public static <TSource, TKey> IOrderedEnumerable<TSource> thenByDescending(IOrderedEnumerable<TSource> source,
+        Function<TSource, TKey> keySelector, Class<TKey> keyType)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        return source.createOrderedEnumerable(keySelector, keyType, null, true);
+    }
+
+    /**
+     * Performs a subsequent ordering of the elements in a sequence in
+     * descending order by using a specified comparer.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param source
+     *            An {@link IOrderedEnumerable} that contains elements to sort.
+     * @param keySelector
+     *            A function to extract a key from each element.
+     * @param keyType
+     *            The type of the key that will be compared while ordering.
+     * @param comparer
+     *            A {@link Comparator} to compare keys.
+     * @return An {@link IOrderedEnumerable} whose elements are sorted in
+     *         descending order according to a key.
+     */
+    public static <TSource, TKey> IOrderedEnumerable<TSource> thenByDescending(IOrderedEnumerable<TSource> source,
+        Function<TSource, TKey> keySelector, Class<TKey> keyType, Comparator<TKey> comparer)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null");
+        }
+
+        return source.createOrderedEnumerable(keySelector, keyType, comparer, true);
+    }
+
+    // endregion
+
+    // region: Ordered Enumerable Class
+
+    // Reference:
+    // http://referencesource.microsoft.com/#System.Core/System/Linq/Enumerable.cs,ffb8de6aefac77cc,references
+    // (5/26/2017)
+
+    private static abstract class OrderedEnumerable<TElement> implements IOrderedEnumerable<TElement>
+    {
+        public OrderedEnumerable(Iterable<TElement> source)
+        {
+            if (source == null)
+            {
+                throw new IllegalArgumentException("source is null.");
+            }
+
+            this.source = source;
+        }
+
+        private final Iterable<TElement> source;
+
+        @Override
+        public Iterator<TElement> iterator()
+        {
+            return getEnumerator();
+        }
+
+        @Override
+        public IEnumerator<TElement> getEnumerator()
+        {
+            ArrayList<TElement> items = Linq.toArrayList(source);
+            int itemCount = items.size();
+            if (itemCount > 0)
+            {
+                EnumerableSorter<TElement> sorter = getEnumerableSorter(null);
+                int[] map = sorter.sort(items, itemCount);
+                sorter = null;
+
+                return new SimpleIterator<TElement>()
+                {
+                    private int index;
+
+                    @Override
+                    public boolean moveNext()
+                    {
+                        if (index < itemCount)
+                        {
+                            TElement element = items.get(map[index++]);
+
+                            setCurrent(element);
+                            return true;
+                        }
+
+                        return false;
+                    }
+                };
+            }
+
+            return new EmptyEnumerator<TElement>();
+        }
+
+        public abstract EnumerableSorter<TElement> getEnumerableSorter(EnumerableSorter<TElement> next);
+
+        @Override
+        public <TKey> IOrderedEnumerable<TElement> createOrderedEnumerable(Function<TElement, TKey> keySelector,
+            Class<TKey> keyType, Comparator<TKey> comparer, boolean descending)
+        {
+            KeyedOrderedEnumerable<TElement, TKey> result
+                = new KeyedOrderedEnumerable<>(source, keySelector, keyType, comparer, descending);
+
+            result.parent = this;
+            return result;
+        }
+    }
+
+    private static class KeyedOrderedEnumerable<TElement, TKey> extends OrderedEnumerable<TElement>
+    {
+        public KeyedOrderedEnumerable(Iterable<TElement> source, Function<TElement, TKey> keySelector,
+            Class<TKey> keyType, Comparator<TKey> comparer, boolean descending)
+        {
+            super(source);
+
+            if (keySelector == null)
+            {
+                throw new IllegalArgumentException("keySelector is null.");
+            }
+
+            this.parent = null;
+            this.keySelector = keySelector;
+            this.descending = descending;
+
+            if (comparer == null)
+            {
+                if (keyType == null)
+                {
+                    throw new IllegalArgumentException("keyType is null.");
+                }
+
+                comparer = DefaultComparator.getDefault(keyType);
+            }
+
+            this.comparer = comparer;
+        }
+
+        private OrderedEnumerable<TElement> parent;
+        private final Function<TElement, TKey> keySelector;
+        private final Comparator<TKey> comparer;
+        private final boolean descending;
+
+        @Override
+        public EnumerableSorter<TElement> getEnumerableSorter(EnumerableSorter<TElement> next)
+        {
+            EnumerableSorter<TElement> sorter
+                = new KeyedEnumerableSorter<TElement, TKey>(keySelector, comparer, descending, next);
+
+            if (parent != null)
+            {
+                sorter = parent.getEnumerableSorter(sorter);
+            }
+
+            return sorter;
+        }
+    }
+
+    private static abstract class EnumerableSorter<TElement>
+    {
+        public abstract void computeKeys(ArrayList<TElement> elements, int count);
+
+        public abstract int compareKeys(int index1, int index2);
+
+        public int[] sort(ArrayList<TElement> elements, int count)
+        {
+            computeKeys(elements, count);
+            int[] map = new int[count];
+            for (int index = 0; index < count; index++)
+            {
+                map[index] = index;
+            }
+
+            quickSort(map, 0, count - 1);
+            return map;
+        }
+
+        private void quickSort(int[] map, int left, int right)
+        {
+            do
+            {
+                int leftIndex = left;
+                int rightIndex = right;
+                int pivotIndex = map[leftIndex + ((rightIndex - leftIndex) >> 1)];
+                do
+                {
+                    while (leftIndex < map.length && compareKeys(pivotIndex, map[leftIndex]) > 0)
+                    {
+                        leftIndex++;
+                    }
+                    while (rightIndex >= 0 && compareKeys(pivotIndex, map[rightIndex]) < 0)
+                    {
+                        rightIndex--;
+                    }
+                    if (leftIndex > rightIndex)
+                    {
+                        break;
+                    }
+                    if (leftIndex < rightIndex)
+                    {
+                        int temp = map[leftIndex];
+                        map[leftIndex] = map[rightIndex];
+                        map[rightIndex] = temp;
+                    }
+                    leftIndex++;
+                    rightIndex--;
+                }
+                while (leftIndex <= rightIndex);
+                if (rightIndex - left <= right - leftIndex)
+                {
+                    if (left < rightIndex)
+                    {
+                        quickSort(map, left, rightIndex);
+                    }
+                    left = leftIndex;
+                }
+                else
+                {
+                    if (leftIndex < right)
+                    {
+                        quickSort(map, leftIndex, right);
+                    }
+                    right = rightIndex;
+                }
+            }
+            while (left < right);
+        }
+    }
+
+    private static class KeyedEnumerableSorter<TElement, TKey> extends EnumerableSorter<TElement>
+    {
+        public KeyedEnumerableSorter(Function<TElement, TKey> keySelector, Comparator<TKey> comparer,
+            boolean descending, EnumerableSorter<TElement> next)
+        {
+            this.keySelector = keySelector;
+            this.comparer = comparer;
+            this.descending = descending;
+            this.next = next;
+        }
+
+        private final Function<TElement, TKey> keySelector;
+        private final Comparator<TKey> comparer;
+        private final boolean descending;
+        private final EnumerableSorter<TElement> next;
+        private ArrayList<TKey> keys;
+
+        @Override
+        public void computeKeys(ArrayList<TElement> elements, int count)
+        {
+            keys = new ArrayList<TKey>(count);
+            for (int index = 0; index < count; index++)
+            {
+                keys.add(keySelector.apply(elements.get(index)));
+            }
+
+            if (next != null)
+            {
+                next.computeKeys(elements, count);
+            }
+        }
+
+        @Override
+        public int compareKeys(int index1, int index2)
+        {
+            int order = comparer.compare(keys.get(index1), keys.get(index2));
+            if (order == 0)
+            {
+                if (next == null)
+                {
+                    return index1 - index2;
+                }
+
+                return next.compareKeys(index1, index2);
+            }
+
+            return descending ? -order : order;
+        }
     }
 
     // endregion
