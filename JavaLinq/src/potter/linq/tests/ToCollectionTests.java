@@ -194,19 +194,19 @@ public class ToCollectionTests
     // region: toDictionary(Iterable<TSource>, Function<TSource, TKey>)
 
     @Test(expected = IllegalArgumentException.class)
-    public void toDictionary2_nullSource_throwsException()
+    public void toHashMap2_nullSource_throwsException()
     {
-        Linq.toDictionary(null, item -> item);
+        Linq.toHashMap(null, item -> item);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void toDictionary2_nullKeySelector_throwsException()
+    public void toHashMap2_nullKeySelector_throwsException()
     {
-        Linq.toDictionary(new ArrayList<Object>(), null);
+        Linq.toHashMap(new ArrayList<Object>(), null);
     }
 
     @Test
-    public void toDictionary2_listOfElements_newMapCreated()
+    public void toHashMap2_listOfElements_newMapCreated()
     {
         // Arrange
         ArrayList<Integer> elements = new ArrayList<>();
@@ -220,7 +220,7 @@ public class ToCollectionTests
         expectedMap.put((char) 34, 34);
 
         // Act
-        HashMap<Character, Integer> actualMap = Linq.toDictionary(elements, item -> (char) (int) item);
+        HashMap<Character, Integer> actualMap = Linq.toHashMap(elements, item -> (char) (int) item);
 
         // Assert
         assertNotNull(actualMap);
@@ -233,25 +233,25 @@ public class ToCollectionTests
     // region: toDictionary(Iterable<TSource>, Function<TSource, TKey>)
 
     @Test(expected = IllegalArgumentException.class)
-    public void toDictionary3_nullSource_throwsException()
+    public void toHashMap3_nullSource_throwsException()
     {
-        Linq.toDictionary(null, item -> item, item -> item);
+        Linq.toHashMap(null, item -> item, item -> item);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void toDictionary3_nullKeySelector_throwsException()
+    public void toHashMap3_nullKeySelector_throwsException()
     {
-        Linq.toDictionary(new ArrayList<Object>(), null, item -> item);
+        Linq.toHashMap(new ArrayList<Object>(), null, item -> item);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void toDictionary3_nullElementSelector_throwsException()
+    public void toHashMap3_nullElementSelector_throwsException()
     {
-        Linq.toDictionary(new ArrayList<Object>(), item -> item, null);
+        Linq.toHashMap(new ArrayList<Object>(), item -> item, null);
     }
 
     @Test
-    public void toDictionary3_listOfElements_newMapCreated()
+    public void toHashMap3_listOfElements_newMapCreated()
     {
         // Arrange
         ArrayList<Integer> elements = new ArrayList<>();
@@ -265,7 +265,7 @@ public class ToCollectionTests
         expectedMap.put(34, (char) 34);
 
         // Act
-        HashMap<Integer, Character> actualMap = Linq.toDictionary(elements, item -> item, item -> (char) (int) item);
+        HashMap<Integer, Character> actualMap = Linq.toHashMap(elements, item -> item, item -> (char) (int) item);
 
         // Assert
         assertNotNull(actualMap);

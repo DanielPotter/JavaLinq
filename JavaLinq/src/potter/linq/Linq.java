@@ -1306,7 +1306,7 @@ public class Linq
      *            A function to extract a key from each element.
      * @return A {@link HashMap} that contains keys and values.
      */
-    public static <TSource, TKey> HashMap<TKey, TSource> toDictionary(Iterable<TSource> source,
+    public static <TSource, TKey> HashMap<TKey, TSource> toHashMap(Iterable<TSource> source,
         Function<TSource, TKey> keySelector)
     {
         if (source == null)
@@ -1318,14 +1318,14 @@ public class Linq
             throw new IllegalArgumentException("keySelector is null.");
         }
 
-        HashMap<TKey, TSource> dictionary = new HashMap<TKey, TSource>();
+        HashMap<TKey, TSource> hashMap = new HashMap<TKey, TSource>();
         for (TSource value : source)
         {
             TKey key = keySelector.apply(value);
-            dictionary.put(key, value);
+            hashMap.put(key, value);
         }
 
-        return dictionary;
+        return hashMap;
     }
 
     /**
@@ -1349,7 +1349,7 @@ public class Linq
      * @return A {@link HashMap} that contains values of type
      *         <code>TElement</code> selected from the input sequence.
      */
-    public static <TSource, TKey, TElement> HashMap<TKey, TElement> toDictionary(Iterable<TSource> source,
+    public static <TSource, TKey, TElement> HashMap<TKey, TElement> toHashMap(Iterable<TSource> source,
         Function<TSource, TKey> keySelector, Function<TSource, TElement> elementSelector)
     {
         if (source == null)
@@ -1365,15 +1365,15 @@ public class Linq
             throw new IllegalArgumentException("elementSelector is null.");
         }
 
-        HashMap<TKey, TElement> dictionary = new HashMap<TKey, TElement>();
+        HashMap<TKey, TElement> hashMap = new HashMap<TKey, TElement>();
         for (TSource item : source)
         {
             TKey key = keySelector.apply(item);
             TElement value = elementSelector.apply(item);
-            dictionary.put(key, value);
+            hashMap.put(key, value);
         }
 
-        return dictionary;
+        return hashMap;
     }
 
     // endregion

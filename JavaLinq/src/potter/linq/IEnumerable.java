@@ -429,9 +429,9 @@ public interface IEnumerable<T> extends Iterable<T>
      *            A function to extract a key from each element.
      * @return A {@link HashMap} that contains keys and values.
      */
-    default <TKey> HashMap<TKey, T> toDictionary(Function<T, TKey> keySelector)
+    default <TKey> HashMap<TKey, T> toHashMap(Function<T, TKey> keySelector)
     {
-        return Linq.toDictionary(this, keySelector);
+        return Linq.toHashMap(this, keySelector);
     }
 
     /**
@@ -451,10 +451,10 @@ public interface IEnumerable<T> extends Iterable<T>
      * @return A {@link HashMap} that contains values of type
      *         <code>TElement</code> selected from the input sequence.
      */
-    default <TKey, TElement> HashMap<TKey, TElement> toDictionary(Function<T, TKey> keySelector,
+    default <TKey, TElement> HashMap<TKey, TElement> toHashMap(Function<T, TKey> keySelector,
         Function<T, TElement> elementSelector)
     {
-        return Linq.toDictionary(this, keySelector, elementSelector);
+        return Linq.toHashMap(this, keySelector, elementSelector);
     }
 
     // endregion
