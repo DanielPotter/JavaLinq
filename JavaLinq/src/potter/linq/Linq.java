@@ -1824,6 +1824,598 @@ public class Linq
 
     // endregion
 
+    // region: Max
+
+    /**
+     * Returns the maximum value in a sequence of {@link Double} values.
+     *
+     * @param source
+     *            A sequence of {@link Double} values of which to determine the
+     *            maximum value.
+     * @return The maximum value in the sequence.
+     */
+    public static double maxDouble(Iterable<Double> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        double maxValue = Double.MIN_VALUE;
+        for (Double value : source)
+        {
+            if (value > maxValue)
+            {
+                maxValue = value;
+            }
+        }
+
+        return maxValue;
+    }
+
+    /**
+     * Invokes a transform function on each element of a sequence and returns
+     * the maximum {@link Double} value.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            A sequence of values of which to determine the maximum value.
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The maximum value in the sequence.
+     */
+    public static <TSource> double maxDouble(Iterable<TSource> source, Function<TSource, Double> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        double maxValue = Double.MIN_VALUE;
+        for (TSource item : source)
+        {
+            Double value = selector.apply(item);
+            if (value > maxValue)
+            {
+                maxValue = value;
+            }
+        }
+
+        return maxValue;
+    }
+
+    /**
+     * Returns the maximum value in a sequence of {@link Float} values.
+     *
+     * @param source
+     *            A sequence of {@link Float} values of which to determine the
+     *            maximum value.
+     * @return The maximum value in the sequence.
+     */
+    public static float maxFloat(Iterable<Float> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        float maxValue = Float.MIN_VALUE;
+        for (Float value : source)
+        {
+            if (value > maxValue)
+            {
+                maxValue = value;
+            }
+        }
+
+        return maxValue;
+    }
+
+    /**
+     * Invokes a transform function on each element of a sequence and returns
+     * the maximum {@link Float} value.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            A sequence of values of which to determine the maximum value.
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The maximum value in the sequence.
+     */
+    public static <TSource> float maxFloat(Iterable<TSource> source, Function<TSource, Float> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        float maxValue = Float.MIN_VALUE;
+        for (TSource item : source)
+        {
+            Float value = selector.apply(item);
+            if (value > maxValue)
+            {
+                maxValue = value;
+            }
+        }
+
+        return maxValue;
+    }
+
+    /**
+     * Returns the maximum value in a sequence of {@link Integer} values.
+     *
+     * @param source
+     *            A sequence of {@link Integer} values of which to determine the
+     *            maximum value.
+     * @return The maximum value in the sequence.
+     */
+    public static int maxInteger(Iterable<Integer> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        int maxValue = Integer.MIN_VALUE;
+        for (Integer value : source)
+        {
+            if (value > maxValue)
+            {
+                maxValue = value;
+            }
+        }
+
+        return maxValue;
+    }
+
+    /**
+     * Invokes a transform function on each element of a sequence and returns
+     * the maximum {@link Integer} value.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            A sequence of values of which to determine the maximum value.
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The maximum value in the sequence.
+     */
+    public static <TSource> int maxInteger(Iterable<TSource> source, Function<TSource, Integer> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        int maxValue = Integer.MIN_VALUE;
+        for (TSource item : source)
+        {
+            Integer value = selector.apply(item);
+            if (value > maxValue)
+            {
+                maxValue = value;
+            }
+        }
+
+        return maxValue;
+    }
+
+    /**
+     * Returns the maximum value in a sequence of {@link Long} values.
+     *
+     * @param source
+     *            A sequence of {@link Long} values of which to determine the
+     *            maximum value.
+     * @return The maximum value in the sequence.
+     */
+    public static long maxLong(Iterable<Long> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        long maxValue = Long.MIN_VALUE;
+        for (Long value : source)
+        {
+            if (value > maxValue)
+            {
+                maxValue = value;
+            }
+        }
+
+        return maxValue;
+    }
+
+    /**
+     * Invokes a transform function on each element of a sequence and returns
+     * the maximum {@link Long} value.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            A sequence of values of which to determine the maximum value.
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The maximum value in the sequence.
+     */
+    public static <TSource> long maxLong(Iterable<TSource> source, Function<TSource, Long> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        long maxValue = Long.MIN_VALUE;
+        for (TSource item : source)
+        {
+            Long value = selector.apply(item);
+            if (value > maxValue)
+            {
+                maxValue = value;
+            }
+        }
+
+        return maxValue;
+    }
+
+    // endregion
+
+    // region: Min
+
+    /**
+     * Returns the minimum value in a sequence of {@link Double} values.
+     *
+     * @param source
+     *            A sequence of {@link Double} values of which to determine the
+     *            minimum value.
+     * @return The minimum value in the sequence.
+     */
+    public static double minDouble(Iterable<Double> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        double minValue = Double.MAX_VALUE;
+        for (Double value : source)
+        {
+            if (value < minValue)
+            {
+                minValue = value;
+            }
+        }
+
+        return minValue;
+    }
+
+    /**
+     * Invokes a transform function on each element of a sequence and returns
+     * the minimum {@link Double} value.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            A sequence of values of which to determine the minimum value.
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The minimum value in the sequence.
+     */
+    public static <TSource> double minDouble(Iterable<TSource> source, Function<TSource, Double> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        double minValue = Double.MAX_VALUE;
+        for (TSource item : source)
+        {
+            Double value = selector.apply(item);
+            if (value < minValue)
+            {
+                minValue = value;
+            }
+        }
+
+        return minValue;
+    }
+
+    /**
+     * Returns the minimum value in a sequence of {@link Float} values.
+     *
+     * @param source
+     *            A sequence of {@link Float} values of which to determine the
+     *            minimum value.
+     * @return The minimum value in the sequence.
+     */
+    public static float minFloat(Iterable<Float> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        float minValue = Float.MAX_VALUE;
+        for (Float value : source)
+        {
+            if (value < minValue)
+            {
+                minValue = value;
+            }
+        }
+
+        return minValue;
+    }
+
+    /**
+     * Invokes a transform function on each element of a sequence and returns
+     * the minimum {@link Float} value.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            A sequence of values of which to determine the minimum value.
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The minimum value in the sequence.
+     */
+    public static <TSource> float minFloat(Iterable<TSource> source, Function<TSource, Float> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        float minValue = Float.MAX_VALUE;
+        for (TSource item : source)
+        {
+            Float value = selector.apply(item);
+            if (value < minValue)
+            {
+                minValue = value;
+            }
+        }
+
+        return minValue;
+    }
+
+    /**
+     * Returns the minimum value in a sequence of {@link Integer} values.
+     *
+     * @param source
+     *            A sequence of {@link Integer} values of which to determine the
+     *            minimum value.
+     * @return The minimum value in the sequence.
+     */
+    public static int minInteger(Iterable<Integer> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        int minValue = Integer.MAX_VALUE;
+        for (Integer value : source)
+        {
+            if (value < minValue)
+            {
+                minValue = value;
+            }
+        }
+
+        return minValue;
+    }
+
+    /**
+     * Invokes a transform function on each element of a sequence and returns
+     * the minimum {@link Integer} value.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            A sequence of values of which to determine the minimum value.
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The minimum value in the sequence.
+     */
+    public static <TSource> int minInteger(Iterable<TSource> source, Function<TSource, Integer> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        int minValue = Integer.MAX_VALUE;
+        for (TSource item : source)
+        {
+            Integer value = selector.apply(item);
+            if (value < minValue)
+            {
+                minValue = value;
+            }
+        }
+
+        return minValue;
+    }
+
+    /**
+     * Returns the minimum value in a sequence of {@link Long} values.
+     *
+     * @param source
+     *            A sequence of {@link Long} values of which to determine the
+     *            minimum value.
+     * @return The minimum value in the sequence.
+     */
+    public static long minLong(Iterable<Long> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        long minValue = Long.MAX_VALUE;
+        for (Long value : source)
+        {
+            if (value < minValue)
+            {
+                minValue = value;
+            }
+        }
+
+        return minValue;
+    }
+
+    /**
+     * Invokes a transform function on each element of a sequence and returns
+     * the minimum {@link Long} value.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            A sequence of values of which to determine the minimum value.
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The minimum value in the sequence.
+     */
+    public static <TSource> long minLong(Iterable<TSource> source, Function<TSource, Long> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        long minValue = Long.MAX_VALUE;
+        for (TSource item : source)
+        {
+            Long value = selector.apply(item);
+            if (value < minValue)
+            {
+                minValue = value;
+            }
+        }
+
+        return minValue;
+    }
+
+    // endregion
+
     // region: Sum
 
     /**

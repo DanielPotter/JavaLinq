@@ -578,6 +578,118 @@ public interface IEnumerable<T> extends Iterable<T>
 
     // endregion
 
+    // region: Max
+
+    /**
+     * Invokes a transform function on each element of a sequence and returns
+     * the maximum {@link Double} value.
+     *
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The maximum value in the sequence.
+     */
+    default double maxDouble(Function<T, Double> selector)
+    {
+        return Linq.maxDouble(this, selector);
+    }
+
+    /**
+     * Invokes a transform function on each element of a sequence and returns
+     * the maximum {@link Float} value.
+     *
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The maximum value in the sequence.
+     */
+    default float maxFloat(Function<T, Float> selector)
+    {
+        return Linq.maxFloat(this, selector);
+    }
+
+    /**
+     * Invokes a transform function on each element of a sequence and returns
+     * the maximum {@link Integer} value.
+     *
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The maximum value in the sequence.
+     */
+    default int maxInteger(Function<T, Integer> selector)
+    {
+        return Linq.maxInteger(this, selector);
+    }
+
+    /**
+     * Invokes a transform function on each element of a sequence and returns
+     * the maximum {@link Long} value.
+     *
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The maximum value in the sequence.
+     */
+    default long maxLong(Function<T, Long> selector)
+    {
+        return Linq.maxLong(this, selector);
+    }
+
+    // endregion
+
+    // region: Min
+
+    /**
+     * Invokes a transform function on each element of a sequence and returns
+     * the minimum {@link Double} value.
+     *
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The minimum value in the sequence.
+     */
+    default double minDouble(Function<T, Double> selector)
+    {
+        return Linq.minDouble(this, selector);
+    }
+
+    /**
+     * Invokes a transform function on each element of a sequence and returns
+     * the minimum {@link Float} value.
+     *
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The minimum value in the sequence.
+     */
+    default float minFloat(Function<T, Float> selector)
+    {
+        return Linq.minFloat(this, selector);
+    }
+
+    /**
+     * Invokes a transform function on each element of a sequence and returns
+     * the minimum {@link Integer} value.
+     *
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The minimum value in the sequence.
+     */
+    default int minInteger(Function<T, Integer> selector)
+    {
+        return Linq.minInteger(this, selector);
+    }
+
+    /**
+     * Invokes a transform function on each element of a sequence and returns
+     * the minimum {@link Long} value.
+     *
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The minimum value in the sequence.
+     */
+    default long minLong(Function<T, Long> selector)
+    {
+        return Linq.minLong(this, selector);
+    }
+
+    // endregion
+
     // region: Sum
 
     /**
