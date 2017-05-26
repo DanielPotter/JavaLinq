@@ -232,6 +232,1008 @@ public class Linq
 
     // endregion
 
+    // region: Mutation
+
+    // region: Concat
+
+    /**
+     * Concatenates two sequences.
+     *
+     * @param <TSource>
+     *            The type of the elements of the input sequences.
+     * @param first
+     *            The first sequence to concatenate.
+     * @param second
+     *            The sequence to concatenate to the first sequence.
+     * @return An {@link Iterable} that contains the concatenated elements of
+     *         the two input sequences.
+     */
+    public static <TSource> IEnumerable<TSource> concat(Iterable<TSource> first, Iterable<TSource> second)
+    {
+        if (first == null)
+        {
+            throw new IllegalArgumentException("first is null.");
+        }
+        if (second == null)
+        {
+            throw new IllegalArgumentException("second is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new ConcatIterator<>(first, second));
+    }
+
+    private static class ConcatIterator<TSource> extends SimpleIterator<TSource>
+    {
+        public ConcatIterator(Iterable<TSource> first, Iterable<TSource> second)
+        {
+            firstIterator = first.iterator();
+            secondIterator = second.iterator();
+        }
+
+        private Iterator<TSource> firstIterator;
+        private Iterator<TSource> secondIterator;
+
+        @Override
+        public boolean moveNext()
+        {
+            if (firstIterator.hasNext())
+            {
+                setCurrent(firstIterator.next());
+                return true;
+            }
+
+            if (secondIterator.hasNext())
+            {
+                setCurrent(secondIterator.next());
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    // endregion
+
+    // region: Except
+
+    /**
+     * Produces the set difference of two sequences by using the default
+     * equality comparer to compare values.
+     *
+     * @param <TSource>
+     *            The type of the elements of the input sequences.
+     * @param first
+     *            An {@link Iterable} whose elements that are not also in second
+     *            will be returned.
+     * @param second
+     *            An {@link Iterable} whose elements that also occur in the
+     *            first sequence will cause those elements to be removed from
+     *            the returned sequence.
+     * @return A sequence that contains the set difference of the elements of
+     *         two sequences.
+     */
+    public static <TSource> IEnumerable<TSource> except(Iterable<TSource> first, Iterable<TSource> second)
+    {
+        if (first == null)
+        {
+            throw new IllegalArgumentException("first is null.");
+        }
+        if (second == null)
+        {
+            throw new IllegalArgumentException("second is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new ExceptIterator<>(first, second));
+    }
+
+    private static class ExceptIterator<TSource> extends SimpleIterator<TSource>
+    {
+        public ExceptIterator(Iterable<TSource> first, Iterable<TSource> second)
+        {
+            firstIterator = first.iterator();
+            this.second = second;
+        }
+
+        private Iterator<TSource> firstIterator;
+        private Iterable<TSource> second;
+
+        private HashSet<TSource> set;
+
+        @Override
+        public boolean moveNext()
+        {
+            if (set == null)
+            {
+                set = new HashSet<TSource>();
+                for (TSource element : second)
+                {
+                    set.add(element);
+                }
+            }
+
+            while (firstIterator.hasNext())
+            {
+                TSource element = firstIterator.next();
+                if (set.add(element))
+                {
+                    setCurrent(element);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    // endregion
+
+    // region: Intersect
+
+    /**
+     * Produces the set intersection of two sequences by using the default
+     * equality comparer to compare values.
+     *
+     * @param <TSource>
+     *            The type of the elements of the input sequences.
+     * @param first
+     *            An {@link Iterable} whose distinct elements that also appear
+     *            in <code>second</code> will be returned.
+     * @param second
+     *            An {@link Iterable} whose distinct elements that also appear
+     *            in the first sequence will be returned.
+     * @return A sequence that contains the elements that form the set
+     *         intersection of two sequences.
+     */
+    public static <TSource> IEnumerable<TSource> intersect(Iterable<TSource> first, Iterable<TSource> second)
+    {
+        if (first == null)
+        {
+            throw new IllegalArgumentException("first is null.");
+        }
+        if (second == null)
+        {
+            throw new IllegalArgumentException("second is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new IntersectIterator<>(first, second));
+    }
+
+    private static class IntersectIterator<TSource> extends SimpleIterator<TSource>
+    {
+        public IntersectIterator(Iterable<TSource> first, Iterable<TSource> second)
+        {
+            firstIterator = first.iterator();
+            this.second = second;
+        }
+
+        private Iterator<TSource> firstIterator;
+        private Iterable<TSource> second;
+
+        private HashSet<TSource> set;
+
+        @Override
+        public boolean moveNext()
+        {
+            if (set == null)
+            {
+                set = new HashSet<TSource>();
+                for (TSource element : second)
+                {
+                    set.add(element);
+                }
+            }
+
+            while (firstIterator.hasNext())
+            {
+                TSource element = firstIterator.next();
+                if (set.remove(element))
+                {
+                    setCurrent(element);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    // endregion
+
+    // region: Of Type
+
+    /**
+     * Filters the elements of an {@link Iterable} based on a specified type.
+     *
+     * @param <TResult>
+     *            The type on which to filter the elements of the sequence.
+     * @param source
+     *            The {@link Iterable} whose elements to filter.
+     * @param type
+     *            The type of elements to filter
+     * @return An {@link Iterable} that contains elements from the input
+     *         sequence of type <code>type</code>.
+     */
+    public static <TResult> IEnumerable<TResult> ofType(Iterable<?> source, Class<TResult> type)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (type == null)
+        {
+            throw new IllegalArgumentException("type is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new OfTypeIterator<>(source, type));
+    }
+
+    private static class OfTypeIterator<TResult> extends SimpleIterator<TResult>
+    {
+        public OfTypeIterator(Iterable<?> source, Class<TResult> type)
+        {
+            sourceIterator = source.iterator();
+            this.type = type;
+        }
+
+        private Iterator<?> sourceIterator;
+        private Class<TResult> type;
+
+        @Override
+        public boolean moveNext()
+        {
+            while (sourceIterator.hasNext())
+            {
+                Object input = sourceIterator.next();
+                if (type.isInstance(input))
+                {
+                    TResult currentValue = type.cast(input);
+                    setCurrent(currentValue);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    // endregion
+
+    // region: Reverse
+
+    /**
+     * Inverts the order of the elements in a sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            A sequence of values to reverse.
+     * @return A sequence whose elements correspond to those of the input
+     *         sequence in reverse order.
+     */
+    public static <TSource> IEnumerable<TSource> reverse(Iterable<TSource> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new ReverseIterator<>(source));
+    }
+
+    private static class ReverseIterator<TSource> extends SimpleIterator<TSource>
+    {
+        public ReverseIterator(Iterable<TSource> source)
+        {
+            this.source = source;
+        }
+
+        private Iterable<TSource> source;
+        private ArrayList<TSource> items;
+        private int index;
+
+        @Override
+        public boolean moveNext()
+        {
+            if (items == null)
+            {
+                items = toArrayList(source);
+                index = items.size() - 1;
+            }
+
+            if (index >= 0)
+            {
+                setCurrent(items.get(index--));
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    // endregion
+
+    // region: Select
+
+    /**
+     * Projects each element of a sequence into a new form.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TResult>
+     *            The type of the value returned by <code>selector</code>.
+     * @param source
+     *            A sequence of values on which to invoke a transform function.
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return An {@link Iterable} whose elements are the result of invoking the
+     *         transform function on each element of <code>source</code>.
+     */
+    public static <TSource, TResult> IEnumerable<TResult> select(Iterable<TSource> source,
+        Function<TSource, TResult> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        return new EnumerableAdapter<>(
+            () -> new SelectEnumerator<TSource, TResult>(source, (item, index) -> selector.apply(item)));
+    }
+
+    /**
+     * Projects each element of a sequence into a new form by incorporating the
+     * element's index.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TResult>
+     *            The type of the value returned by <code>selector</code>.
+     * @param source
+     *            A sequence of values on which to invoke a transform function.
+     * @param selector
+     *            A transform function to apply to each source element; the
+     *            second parameter of the function represents the index of the
+     *            source element.
+     * @return An {@link Iterable} whose elements are the result of invoking the
+     *         transform function on each element of <code>source</code>.
+     */
+    public static <TSource, TResult> IEnumerable<TResult> select(Iterable<TSource> source,
+        BiFunction<TSource, Integer, TResult> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new SelectEnumerator<TSource, TResult>(source, selector));
+    }
+
+    private static class SelectEnumerator<TSource, TResult> extends SimpleIterator<TResult>
+    {
+        public SelectEnumerator(Iterable<TSource> source, BiFunction<TSource, Integer, TResult> selector)
+        {
+            this.selector = selector;
+            sourceIterator = source.iterator();
+        }
+
+        private final BiFunction<TSource, Integer, TResult> selector;
+
+        private Iterator<TSource> sourceIterator;
+        private int index;
+
+        @Override
+        public boolean moveNext()
+        {
+            if (sourceIterator.hasNext())
+            {
+                TSource input = sourceIterator.next();
+                TResult currentValue = selector.apply(input, index++);
+                setCurrent(currentValue);
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    // endregion
+
+    // region: Select Many
+
+    /**
+     * Projects each element of a sequence to an {@link IEnumerable} and
+     * flattens the resulting sequences into one sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TResult>
+     *            The type of the elements of the sequence returned by
+     *            <code>selector</code>.
+     * @param source
+     *            A sequence of values to project.
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return An {@link IEnumerable} whose elements are the result of invoking
+     *         the one-to-many transform function on each element of the input
+     *         sequence.
+     */
+    public static <TSource, TResult> IEnumerable<TResult> selectMany(Iterable<TSource> source,
+        Function<TSource, Iterable<TResult>> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new SelectManyEnumerator<TSource, TResult>(source)
+        {
+            @Override
+            public Iterable<TResult> convert(TSource item, int index)
+            {
+                return selector.apply(item);
+            }
+        });
+    }
+
+    /**
+     * Projects each element of a sequence to an {@link IEnumerable}, and
+     * flattens the resulting sequences into one sequence. The index of each
+     * source element is used in the projected form of that element.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TResult>
+     *            The type of the elements of the sequence returned by
+     *            <code>selector</code>.
+     * @param source
+     *            A sequence of values to project.
+     * @param selector
+     *            A transform function to apply to each source element; the
+     *            second parameter of the function represents the index of the
+     *            source element.
+     * @return An {@link IEnumerable} whose elements are the result of invoking
+     *         the one-to-many transform function on each element of an input
+     *         sequence.
+     */
+    public static <TSource, TResult> IEnumerable<TResult> selectMany(Iterable<TSource> source,
+        BiFunction<TSource, Integer, Iterable<TResult>> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new SelectManyEnumerator<TSource, TResult>(source)
+        {
+            @Override
+            public Iterable<TResult> convert(TSource item, int index)
+            {
+                return selector.apply(item, index);
+            }
+        });
+    }
+
+    private static abstract class SelectManyEnumerator<TSource, TResult> extends SimpleIterator<TResult>
+    {
+        public SelectManyEnumerator(Iterable<TSource> source)
+        {
+            sourceIterator = source.iterator();
+        }
+
+        private Iterator<TSource> sourceIterator;
+        private Iterator<TResult> currentIterator;
+        private int sourceIndex;
+
+        @Override
+        public boolean moveNext()
+        {
+            while (currentIterator == null || currentIterator.hasNext() == false)
+            {
+                if (sourceIterator.hasNext())
+                {
+                    TSource input = sourceIterator.next();
+                    currentIterator = convert(input, sourceIndex++).iterator();
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            setCurrent(currentIterator.next());
+            return true;
+        }
+
+        public abstract Iterable<TResult> convert(TSource item, int index);
+    }
+
+    // endregion
+
+    // region: Skip
+
+    /**
+     * Bypasses a specified number of elements in a sequence and then returns
+     * the remaining elements.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} from which to return elements.
+     * @param count
+     *            The number of elements to skip before returning the remaining
+     *            elements.
+     * @return An {@link IEnumerable} that contains the elements that occur
+     *         after the specified index in the input sequence.
+     */
+    public static <TSource> IEnumerable<TSource> skip(Iterable<TSource> source, int count)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new SkipWhileEnumerator<TSource>(source)
+        {
+            @Override
+            public boolean skip(TSource item, int index)
+            {
+                return index < count;
+            }
+        });
+    }
+
+    /**
+     * Bypasses elements in a sequence as long as a specified condition is true
+     * and then returns the remaining elements.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} from which to return elements.
+     * @param predicate
+     *            A function to test each element for a condition.
+     * @return An {@link IEnumerable} that contains the elements from the input
+     *         sequence starting at the first element in the linear series that
+     *         does not pass the test specified by <code>predicate</code>.
+     */
+    public static <TSource> IEnumerable<TSource> skipWhile(Iterable<TSource> source,
+        Function<TSource, Boolean> predicate)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (predicate == null)
+        {
+            throw new IllegalArgumentException("predicate is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new SkipWhileEnumerator<TSource>(source)
+        {
+            @Override
+            public boolean skip(TSource item, int index)
+            {
+                return predicate.apply(item);
+            }
+        });
+    }
+
+    /**
+     * Bypasses elements in a sequence as long as a specified condition is true
+     * and then returns the remaining elements. The element's index is used in
+     * the logic of the predicate function.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} from which to return elements.
+     * @param predicate
+     *            A function to test each source element for a condition; the
+     *            second parameter of the function represents the index of the
+     *            source element.
+     * @return An {@link IEnumerable} that contains the elements from the input
+     *         sequence starting at the first element in the linear series that
+     *         does not pass the test specified by <code>predicate</code>.
+     */
+    public static <TSource> IEnumerable<TSource> skipWhile(Iterable<TSource> source,
+        BiFunction<TSource, Integer, Boolean> predicate)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (predicate == null)
+        {
+            throw new IllegalArgumentException("predicate is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new SkipWhileEnumerator<TSource>(source)
+        {
+            @Override
+            public boolean skip(TSource item, int index)
+            {
+                return predicate.apply(item, index);
+            }
+        });
+    }
+
+    private static abstract class SkipWhileEnumerator<TSource> extends SimpleIterator<TSource>
+    {
+        public SkipWhileEnumerator(Iterable<TSource> source)
+        {
+            sourceIterator = source.iterator();
+        }
+
+        private Iterator<TSource> sourceIterator;
+        private int index;
+        private boolean hasSkipped;
+
+        @Override
+        public boolean moveNext()
+        {
+            if (hasSkipped == false)
+            {
+                hasSkipped = true;
+
+                while (sourceIterator.hasNext())
+                {
+                    TSource current = sourceIterator.next();
+                    if (skip(current, index++) == false)
+                    {
+                        setCurrent(current);
+                        return true;
+                    }
+                }
+            }
+
+            if (sourceIterator.hasNext())
+            {
+                setCurrent(sourceIterator.next());
+                return true;
+            }
+
+            return false;
+        }
+
+        public abstract boolean skip(TSource item, int index);
+    }
+
+    // endregion
+
+    // region: Take
+
+    /**
+     * Returns a specified number of contiguous elements from the start of a
+     * sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            The sequence from which to return elements.
+     * @param count
+     *            The number of elements to return.
+     * @return An {@link IEnumerable} that contains the specified number of
+     *         elements from the start of the input sequence.
+     */
+    public static <TSource> IEnumerable<TSource> take(Iterable<TSource> source, int count)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new TakeWhileEnumerator<TSource>(source)
+        {
+            @Override
+            public boolean take(TSource item, int index)
+            {
+                return index < count;
+            }
+        });
+    }
+
+    /**
+     * Returns elements from a sequence as long as a specified condition is
+     * true.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            The sequence from which to return elements.
+     * @param predicate
+     *            A function to test each element for a condition.
+     * @return An {@link IEnumerable} that contains the elements from the input
+     *         sequence that occur before the element at which the test no
+     *         longer passes.
+     */
+    public static <TSource> IEnumerable<TSource> takeWhile(Iterable<TSource> source,
+        Function<TSource, Boolean> predicate)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (predicate == null)
+        {
+            throw new IllegalArgumentException("predicate is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new TakeWhileEnumerator<TSource>(source)
+        {
+            @Override
+            public boolean take(TSource item, int index)
+            {
+                return predicate.apply(item);
+            }
+        });
+    }
+
+    /**
+     * Returns elements from a sequence as long as a specified condition is
+     * true. The element's index is used in the logic of the predicate function.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            The sequence from which to return elements.
+     * @param predicate
+     *            A function to test each source element for a condition; the
+     *            second parameter of the function represents the index of the
+     *            source element.
+     * @return An {@link IEnumerable} that contains the elements from the input
+     *         sequence that occur before the element at which the test no
+     *         longer passes.
+     */
+    public static <TSource> IEnumerable<TSource> takeWhile(Iterable<TSource> source,
+        BiFunction<TSource, Integer, Boolean> predicate)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (predicate == null)
+        {
+            throw new IllegalArgumentException("predicate is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new TakeWhileEnumerator<TSource>(source)
+        {
+            @Override
+            public boolean take(TSource item, int index)
+            {
+                return predicate.apply(item, index);
+            }
+        });
+    }
+
+    private static abstract class TakeWhileEnumerator<TSource> extends SimpleIterator<TSource>
+    {
+        public TakeWhileEnumerator(Iterable<TSource> source)
+        {
+            sourceIterator = source.iterator();
+        }
+
+        private Iterator<TSource> sourceIterator;
+        private int index;
+        private boolean isTaking = true;
+
+        @Override
+        public boolean moveNext()
+        {
+            if (isTaking && sourceIterator.hasNext())
+            {
+                TSource item = sourceIterator.next();
+                if (take(item, index++))
+                {
+                    setCurrent(item);
+                    return true;
+                }
+
+                isTaking = false;
+            }
+
+            return false;
+        }
+
+        public abstract boolean take(TSource item, int index);
+    }
+
+    // endregion
+
+    // region: Union
+
+    /**
+     * Produces the set union of two sequences by using the default equality
+     * comparer.
+     *
+     * @param <TSource>
+     *            The type of the elements of the input sequences.
+     * @param first
+     *            An {@link Iterable} whose distinct elements form the first set
+     *            for the union.
+     * @param second
+     *            An {@link Iterable} whose distinct elements form the second
+     *            set for the union.
+     * @return An {@link IEnumerable} that contains the elements from both input
+     *         sequences, excluding duplicates.
+     */
+    public static <TSource> IEnumerable<TSource> union(Iterable<TSource> first, Iterable<TSource> second)
+    {
+        if (first == null)
+        {
+            throw new IllegalArgumentException("first is null.");
+        }
+        if (second == null)
+        {
+            throw new IllegalArgumentException("second is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new UnionIterator<>(first, second));
+    }
+
+    private static class UnionIterator<TSource> extends SimpleIterator<TSource>
+    {
+        public UnionIterator(Iterable<TSource> first, Iterable<TSource> second)
+        {
+            firstIterator = first.iterator();
+            secondIterator = second.iterator();
+        }
+
+        private Iterator<TSource> firstIterator;
+        private Iterator<TSource> secondIterator;
+
+        private HashSet<TSource> set = new HashSet<TSource>();
+
+        @Override
+        public boolean moveNext()
+        {
+            while (firstIterator.hasNext())
+            {
+                TSource element = firstIterator.next();
+                if (set.add(element))
+                {
+                    setCurrent(element);
+                    return true;
+                }
+            }
+
+            while (secondIterator.hasNext())
+            {
+                TSource element = secondIterator.next();
+                if (set.add(element))
+                {
+                    setCurrent(element);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    // endregion
+
+    // region: Where
+
+    /**
+     * Filters a sequence of values based on a predicate.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} to filter.
+     * @param predicate
+     *            A function to test each element for a condition.
+     * @return An {@link Iterable} that contains elements from the input
+     *         sequence that satisfy the condition.
+     */
+    public static <TSource> IEnumerable<TSource> where(Iterable<TSource> source, Function<TSource, Boolean> predicate)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (predicate == null)
+        {
+            throw new IllegalArgumentException("predicate is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new WhereEnumerator<TSource>(source.iterator())
+        {
+            @Override
+            public boolean include(TSource item, int index)
+            {
+                return predicate.apply(item);
+            }
+        });
+    }
+
+    /**
+     * Filters a sequence of values based on a predicate. Each element's index
+     * is used in the logic of the predicate function.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            An {@link Iterable} to filter.
+     * @param predicate
+     *            A function to test each source element for a condition; the
+     *            second parameter of the function represents the index of the
+     *            source element.
+     * @return An {@link Iterable} that contains elements from the input
+     *         sequence that satisfy the condition.
+     */
+    public static <TSource> IEnumerable<TSource> where(Iterable<TSource> source,
+        BiFunction<TSource, Integer, Boolean> predicate)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (predicate == null)
+        {
+            throw new IllegalArgumentException("predicate is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new WhereEnumerator<TSource>(source.iterator())
+        {
+            @Override
+            public boolean include(TSource item, int index)
+            {
+                return predicate.apply(item, index);
+            }
+        });
+    }
+
+    private static abstract class WhereEnumerator<T> extends SimpleIterator<T>
+    {
+        public WhereEnumerator(Iterator<T> source)
+        {
+            this.source = source;
+        }
+
+        private Iterator<T> source;
+        private int index;
+
+        @Override
+        public boolean moveNext()
+        {
+            while (source.hasNext())
+            {
+                T item = source.next();
+                if (include(item, index++))
+                {
+                    setCurrent(item);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public abstract boolean include(T item, int index);
+    }
+
+    // endregion
+
+    // endregion
+
     // region: Aggregation
 
     // region: Aggregate
@@ -2695,1008 +3697,6 @@ public class Linq
         }
 
         return sum;
-    }
-
-    // endregion
-
-    // endregion
-
-    // region: Mutation
-
-    // region: Concat
-
-    /**
-     * Concatenates two sequences.
-     *
-     * @param <TSource>
-     *            The type of the elements of the input sequences.
-     * @param first
-     *            The first sequence to concatenate.
-     * @param second
-     *            The sequence to concatenate to the first sequence.
-     * @return An {@link Iterable} that contains the concatenated elements of
-     *         the two input sequences.
-     */
-    public static <TSource> IEnumerable<TSource> concat(Iterable<TSource> first, Iterable<TSource> second)
-    {
-        if (first == null)
-        {
-            throw new IllegalArgumentException("first is null.");
-        }
-        if (second == null)
-        {
-            throw new IllegalArgumentException("second is null.");
-        }
-
-        return new EnumerableAdapter<>(() -> new ConcatIterator<>(first, second));
-    }
-
-    private static class ConcatIterator<TSource> extends SimpleIterator<TSource>
-    {
-        public ConcatIterator(Iterable<TSource> first, Iterable<TSource> second)
-        {
-            firstIterator = first.iterator();
-            secondIterator = second.iterator();
-        }
-
-        private Iterator<TSource> firstIterator;
-        private Iterator<TSource> secondIterator;
-
-        @Override
-        public boolean moveNext()
-        {
-            if (firstIterator.hasNext())
-            {
-                setCurrent(firstIterator.next());
-                return true;
-            }
-
-            if (secondIterator.hasNext())
-            {
-                setCurrent(secondIterator.next());
-                return true;
-            }
-
-            return false;
-        }
-    }
-
-    // endregion
-
-    // region: Except
-
-    /**
-     * Produces the set difference of two sequences by using the default
-     * equality comparer to compare values.
-     *
-     * @param <TSource>
-     *            The type of the elements of the input sequences.
-     * @param first
-     *            An {@link Iterable} whose elements that are not also in second
-     *            will be returned.
-     * @param second
-     *            An {@link Iterable} whose elements that also occur in the
-     *            first sequence will cause those elements to be removed from
-     *            the returned sequence.
-     * @return A sequence that contains the set difference of the elements of
-     *         two sequences.
-     */
-    public static <TSource> IEnumerable<TSource> except(Iterable<TSource> first, Iterable<TSource> second)
-    {
-        if (first == null)
-        {
-            throw new IllegalArgumentException("first is null.");
-        }
-        if (second == null)
-        {
-            throw new IllegalArgumentException("second is null.");
-        }
-
-        return new EnumerableAdapter<>(() -> new ExceptIterator<>(first, second));
-    }
-
-    private static class ExceptIterator<TSource> extends SimpleIterator<TSource>
-    {
-        public ExceptIterator(Iterable<TSource> first, Iterable<TSource> second)
-        {
-            firstIterator = first.iterator();
-            this.second = second;
-        }
-
-        private Iterator<TSource> firstIterator;
-        private Iterable<TSource> second;
-
-        private HashSet<TSource> set;
-
-        @Override
-        public boolean moveNext()
-        {
-            if (set == null)
-            {
-                set = new HashSet<TSource>();
-                for (TSource element : second)
-                {
-                    set.add(element);
-                }
-            }
-
-            while (firstIterator.hasNext())
-            {
-                TSource element = firstIterator.next();
-                if (set.add(element))
-                {
-                    setCurrent(element);
-                    return true;
-                }
-            }
-
-            return false;
-        }
-    }
-
-    // endregion
-
-    // region: Intersect
-
-    /**
-     * Produces the set intersection of two sequences by using the default
-     * equality comparer to compare values.
-     *
-     * @param <TSource>
-     *            The type of the elements of the input sequences.
-     * @param first
-     *            An {@link Iterable} whose distinct elements that also appear
-     *            in <code>second</code> will be returned.
-     * @param second
-     *            An {@link Iterable} whose distinct elements that also appear
-     *            in the first sequence will be returned.
-     * @return A sequence that contains the elements that form the set
-     *         intersection of two sequences.
-     */
-    public static <TSource> IEnumerable<TSource> intersect(Iterable<TSource> first, Iterable<TSource> second)
-    {
-        if (first == null)
-        {
-            throw new IllegalArgumentException("first is null.");
-        }
-        if (second == null)
-        {
-            throw new IllegalArgumentException("second is null.");
-        }
-
-        return new EnumerableAdapter<>(() -> new IntersectIterator<>(first, second));
-    }
-
-    private static class IntersectIterator<TSource> extends SimpleIterator<TSource>
-    {
-        public IntersectIterator(Iterable<TSource> first, Iterable<TSource> second)
-        {
-            firstIterator = first.iterator();
-            this.second = second;
-        }
-
-        private Iterator<TSource> firstIterator;
-        private Iterable<TSource> second;
-
-        private HashSet<TSource> set;
-
-        @Override
-        public boolean moveNext()
-        {
-            if (set == null)
-            {
-                set = new HashSet<TSource>();
-                for (TSource element : second)
-                {
-                    set.add(element);
-                }
-            }
-
-            while (firstIterator.hasNext())
-            {
-                TSource element = firstIterator.next();
-                if (set.remove(element))
-                {
-                    setCurrent(element);
-                    return true;
-                }
-            }
-
-            return false;
-        }
-    }
-
-    // endregion
-
-    // region: Of Type
-
-    /**
-     * Filters the elements of an {@link Iterable} based on a specified type.
-     *
-     * @param <TResult>
-     *            The type on which to filter the elements of the sequence.
-     * @param source
-     *            The {@link Iterable} whose elements to filter.
-     * @param type
-     *            The type of elements to filter
-     * @return An {@link Iterable} that contains elements from the input
-     *         sequence of type <code>type</code>.
-     */
-    public static <TResult> IEnumerable<TResult> ofType(Iterable<?> source, Class<TResult> type)
-    {
-        if (source == null)
-        {
-            throw new IllegalArgumentException("source is null.");
-        }
-        if (type == null)
-        {
-            throw new IllegalArgumentException("type is null.");
-        }
-
-        return new EnumerableAdapter<>(() -> new OfTypeIterator<>(source, type));
-    }
-
-    private static class OfTypeIterator<TResult> extends SimpleIterator<TResult>
-    {
-        public OfTypeIterator(Iterable<?> source, Class<TResult> type)
-        {
-            sourceIterator = source.iterator();
-            this.type = type;
-        }
-
-        private Iterator<?> sourceIterator;
-        private Class<TResult> type;
-
-        @Override
-        public boolean moveNext()
-        {
-            while (sourceIterator.hasNext())
-            {
-                Object input = sourceIterator.next();
-                if (type.isInstance(input))
-                {
-                    TResult currentValue = type.cast(input);
-                    setCurrent(currentValue);
-                    return true;
-                }
-            }
-
-            return false;
-        }
-    }
-
-    // endregion
-
-    // region: Reverse
-
-    /**
-     * Inverts the order of the elements in a sequence.
-     *
-     * @param <TSource>
-     *            The type of the elements of <code>source</code>.
-     * @param source
-     *            A sequence of values to reverse.
-     * @return A sequence whose elements correspond to those of the input
-     *         sequence in reverse order.
-     */
-    public static <TSource> IEnumerable<TSource> reverse(Iterable<TSource> source)
-    {
-        if (source == null)
-        {
-            throw new IllegalArgumentException("source is null.");
-        }
-
-        return new EnumerableAdapter<>(() -> new ReverseIterator<>(source));
-    }
-
-    private static class ReverseIterator<TSource> extends SimpleIterator<TSource>
-    {
-        public ReverseIterator(Iterable<TSource> source)
-        {
-            this.source = source;
-        }
-
-        private Iterable<TSource> source;
-        private ArrayList<TSource> items;
-        private int index;
-
-        @Override
-        public boolean moveNext()
-        {
-            if (items == null)
-            {
-                items = toArrayList(source);
-                index = items.size() - 1;
-            }
-
-            if (index >= 0)
-            {
-                setCurrent(items.get(index--));
-                return true;
-            }
-
-            return false;
-        }
-    }
-
-    // endregion
-
-    // region: Select
-
-    /**
-     * Projects each element of a sequence into a new form.
-     *
-     * @param <TSource>
-     *            The type of the elements of <code>source</code>.
-     * @param <TResult>
-     *            The type of the value returned by <code>selector</code>.
-     * @param source
-     *            A sequence of values on which to invoke a transform function.
-     * @param selector
-     *            A transform function to apply to each element.
-     * @return An {@link Iterable} whose elements are the result of invoking the
-     *         transform function on each element of <code>source</code>.
-     */
-    public static <TSource, TResult> IEnumerable<TResult> select(Iterable<TSource> source,
-        Function<TSource, TResult> selector)
-    {
-        if (source == null)
-        {
-            throw new IllegalArgumentException("source is null.");
-        }
-        if (selector == null)
-        {
-            throw new IllegalArgumentException("selector is null.");
-        }
-
-        return new EnumerableAdapter<>(
-            () -> new SelectEnumerator<TSource, TResult>(source, (item, index) -> selector.apply(item)));
-    }
-
-    /**
-     * Projects each element of a sequence into a new form by incorporating the
-     * element's index.
-     *
-     * @param <TSource>
-     *            The type of the elements of <code>source</code>.
-     * @param <TResult>
-     *            The type of the value returned by <code>selector</code>.
-     * @param source
-     *            A sequence of values on which to invoke a transform function.
-     * @param selector
-     *            A transform function to apply to each source element; the
-     *            second parameter of the function represents the index of the
-     *            source element.
-     * @return An {@link Iterable} whose elements are the result of invoking the
-     *         transform function on each element of <code>source</code>.
-     */
-    public static <TSource, TResult> IEnumerable<TResult> select(Iterable<TSource> source,
-        BiFunction<TSource, Integer, TResult> selector)
-    {
-        if (source == null)
-        {
-            throw new IllegalArgumentException("source is null.");
-        }
-        if (selector == null)
-        {
-            throw new IllegalArgumentException("selector is null.");
-        }
-
-        return new EnumerableAdapter<>(() -> new SelectEnumerator<TSource, TResult>(source, selector));
-    }
-
-    private static class SelectEnumerator<TSource, TResult> extends SimpleIterator<TResult>
-    {
-        public SelectEnumerator(Iterable<TSource> source, BiFunction<TSource, Integer, TResult> selector)
-        {
-            this.selector = selector;
-            sourceIterator = source.iterator();
-        }
-
-        private final BiFunction<TSource, Integer, TResult> selector;
-
-        private Iterator<TSource> sourceIterator;
-        private int index;
-
-        @Override
-        public boolean moveNext()
-        {
-            if (sourceIterator.hasNext())
-            {
-                TSource input = sourceIterator.next();
-                TResult currentValue = selector.apply(input, index++);
-                setCurrent(currentValue);
-                return true;
-            }
-
-            return false;
-        }
-    }
-
-    // endregion
-
-    // region: Select Many
-
-    /**
-     * Projects each element of a sequence to an {@link IEnumerable} and
-     * flattens the resulting sequences into one sequence.
-     *
-     * @param <TSource>
-     *            The type of the elements of <code>source</code>.
-     * @param <TResult>
-     *            The type of the elements of the sequence returned by
-     *            <code>selector</code>.
-     * @param source
-     *            A sequence of values to project.
-     * @param selector
-     *            A transform function to apply to each element.
-     * @return An {@link IEnumerable} whose elements are the result of invoking
-     *         the one-to-many transform function on each element of the input
-     *         sequence.
-     */
-    public static <TSource, TResult> IEnumerable<TResult> selectMany(Iterable<TSource> source,
-        Function<TSource, Iterable<TResult>> selector)
-    {
-        if (source == null)
-        {
-            throw new IllegalArgumentException("source is null.");
-        }
-        if (selector == null)
-        {
-            throw new IllegalArgumentException("selector is null.");
-        }
-
-        return new EnumerableAdapter<>(() -> new SelectManyEnumerator<TSource, TResult>(source)
-        {
-            @Override
-            public Iterable<TResult> convert(TSource item, int index)
-            {
-                return selector.apply(item);
-            }
-        });
-    }
-
-    /**
-     * Projects each element of a sequence to an {@link IEnumerable}, and
-     * flattens the resulting sequences into one sequence. The index of each
-     * source element is used in the projected form of that element.
-     *
-     * @param <TSource>
-     *            The type of the elements of <code>source</code>.
-     * @param <TResult>
-     *            The type of the elements of the sequence returned by
-     *            <code>selector</code>.
-     * @param source
-     *            A sequence of values to project.
-     * @param selector
-     *            A transform function to apply to each source element; the
-     *            second parameter of the function represents the index of the
-     *            source element.
-     * @return An {@link IEnumerable} whose elements are the result of invoking
-     *         the one-to-many transform function on each element of an input
-     *         sequence.
-     */
-    public static <TSource, TResult> IEnumerable<TResult> selectMany(Iterable<TSource> source,
-        BiFunction<TSource, Integer, Iterable<TResult>> selector)
-    {
-        if (source == null)
-        {
-            throw new IllegalArgumentException("source is null.");
-        }
-        if (selector == null)
-        {
-            throw new IllegalArgumentException("selector is null.");
-        }
-
-        return new EnumerableAdapter<>(() -> new SelectManyEnumerator<TSource, TResult>(source)
-        {
-            @Override
-            public Iterable<TResult> convert(TSource item, int index)
-            {
-                return selector.apply(item, index);
-            }
-        });
-    }
-
-    private static abstract class SelectManyEnumerator<TSource, TResult> extends SimpleIterator<TResult>
-    {
-        public SelectManyEnumerator(Iterable<TSource> source)
-        {
-            sourceIterator = source.iterator();
-        }
-
-        private Iterator<TSource> sourceIterator;
-        private Iterator<TResult> currentIterator;
-        private int sourceIndex;
-
-        @Override
-        public boolean moveNext()
-        {
-            while (currentIterator == null || currentIterator.hasNext() == false)
-            {
-                if (sourceIterator.hasNext())
-                {
-                    TSource input = sourceIterator.next();
-                    currentIterator = convert(input, sourceIndex++).iterator();
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            setCurrent(currentIterator.next());
-            return true;
-        }
-
-        public abstract Iterable<TResult> convert(TSource item, int index);
-    }
-
-    // endregion
-
-    // region: Skip
-
-    /**
-     * Bypasses a specified number of elements in a sequence and then returns
-     * the remaining elements.
-     *
-     * @param <TSource>
-     *            The type of the elements of <code>source</code>.
-     * @param source
-     *            An {@link Iterable} from which to return elements.
-     * @param count
-     *            The number of elements to skip before returning the remaining
-     *            elements.
-     * @return An {@link IEnumerable} that contains the elements that occur
-     *         after the specified index in the input sequence.
-     */
-    public static <TSource> IEnumerable<TSource> skip(Iterable<TSource> source, int count)
-    {
-        if (source == null)
-        {
-            throw new IllegalArgumentException("source is null.");
-        }
-
-        return new EnumerableAdapter<>(() -> new SkipWhileEnumerator<TSource>(source)
-        {
-            @Override
-            public boolean skip(TSource item, int index)
-            {
-                return index < count;
-            }
-        });
-    }
-
-    /**
-     * Bypasses elements in a sequence as long as a specified condition is true
-     * and then returns the remaining elements.
-     *
-     * @param <TSource>
-     *            The type of the elements of <code>source</code>.
-     * @param source
-     *            An {@link Iterable} from which to return elements.
-     * @param predicate
-     *            A function to test each element for a condition.
-     * @return An {@link IEnumerable} that contains the elements from the input
-     *         sequence starting at the first element in the linear series that
-     *         does not pass the test specified by <code>predicate</code>.
-     */
-    public static <TSource> IEnumerable<TSource> skipWhile(Iterable<TSource> source,
-        Function<TSource, Boolean> predicate)
-    {
-        if (source == null)
-        {
-            throw new IllegalArgumentException("source is null.");
-        }
-        if (predicate == null)
-        {
-            throw new IllegalArgumentException("predicate is null.");
-        }
-
-        return new EnumerableAdapter<>(() -> new SkipWhileEnumerator<TSource>(source)
-        {
-            @Override
-            public boolean skip(TSource item, int index)
-            {
-                return predicate.apply(item);
-            }
-        });
-    }
-
-    /**
-     * Bypasses elements in a sequence as long as a specified condition is true
-     * and then returns the remaining elements. The element's index is used in
-     * the logic of the predicate function.
-     *
-     * @param <TSource>
-     *            The type of the elements of <code>source</code>.
-     * @param source
-     *            An {@link Iterable} from which to return elements.
-     * @param predicate
-     *            A function to test each source element for a condition; the
-     *            second parameter of the function represents the index of the
-     *            source element.
-     * @return An {@link IEnumerable} that contains the elements from the input
-     *         sequence starting at the first element in the linear series that
-     *         does not pass the test specified by <code>predicate</code>.
-     */
-    public static <TSource> IEnumerable<TSource> skipWhile(Iterable<TSource> source,
-        BiFunction<TSource, Integer, Boolean> predicate)
-    {
-        if (source == null)
-        {
-            throw new IllegalArgumentException("source is null.");
-        }
-        if (predicate == null)
-        {
-            throw new IllegalArgumentException("predicate is null.");
-        }
-
-        return new EnumerableAdapter<>(() -> new SkipWhileEnumerator<TSource>(source)
-        {
-            @Override
-            public boolean skip(TSource item, int index)
-            {
-                return predicate.apply(item, index);
-            }
-        });
-    }
-
-    private static abstract class SkipWhileEnumerator<TSource> extends SimpleIterator<TSource>
-    {
-        public SkipWhileEnumerator(Iterable<TSource> source)
-        {
-            sourceIterator = source.iterator();
-        }
-
-        private Iterator<TSource> sourceIterator;
-        private int index;
-        private boolean hasSkipped;
-
-        @Override
-        public boolean moveNext()
-        {
-            if (hasSkipped == false)
-            {
-                hasSkipped = true;
-
-                while (sourceIterator.hasNext())
-                {
-                    TSource current = sourceIterator.next();
-                    if (skip(current, index++) == false)
-                    {
-                        setCurrent(current);
-                        return true;
-                    }
-                }
-            }
-
-            if (sourceIterator.hasNext())
-            {
-                setCurrent(sourceIterator.next());
-                return true;
-            }
-
-            return false;
-        }
-
-        public abstract boolean skip(TSource item, int index);
-    }
-
-    // endregion
-
-    // region: Take
-
-    /**
-     * Returns a specified number of contiguous elements from the start of a
-     * sequence.
-     *
-     * @param <TSource>
-     *            The type of the elements of <code>source</code>.
-     * @param source
-     *            The sequence from which to return elements.
-     * @param count
-     *            The number of elements to return.
-     * @return An {@link IEnumerable} that contains the specified number of
-     *         elements from the start of the input sequence.
-     */
-    public static <TSource> IEnumerable<TSource> take(Iterable<TSource> source, int count)
-    {
-        if (source == null)
-        {
-            throw new IllegalArgumentException("source is null.");
-        }
-
-        return new EnumerableAdapter<>(() -> new TakeWhileEnumerator<TSource>(source)
-        {
-            @Override
-            public boolean take(TSource item, int index)
-            {
-                return index < count;
-            }
-        });
-    }
-
-    /**
-     * Returns elements from a sequence as long as a specified condition is
-     * true.
-     *
-     * @param <TSource>
-     *            The type of the elements of <code>source</code>.
-     * @param source
-     *            The sequence from which to return elements.
-     * @param predicate
-     *            A function to test each element for a condition.
-     * @return An {@link IEnumerable} that contains the elements from the input
-     *         sequence that occur before the element at which the test no
-     *         longer passes.
-     */
-    public static <TSource> IEnumerable<TSource> takeWhile(Iterable<TSource> source,
-        Function<TSource, Boolean> predicate)
-    {
-        if (source == null)
-        {
-            throw new IllegalArgumentException("source is null.");
-        }
-        if (predicate == null)
-        {
-            throw new IllegalArgumentException("predicate is null.");
-        }
-
-        return new EnumerableAdapter<>(() -> new TakeWhileEnumerator<TSource>(source)
-        {
-            @Override
-            public boolean take(TSource item, int index)
-            {
-                return predicate.apply(item);
-            }
-        });
-    }
-
-    /**
-     * Returns elements from a sequence as long as a specified condition is
-     * true. The element's index is used in the logic of the predicate function.
-     *
-     * @param <TSource>
-     *            The type of the elements of <code>source</code>.
-     * @param source
-     *            The sequence from which to return elements.
-     * @param predicate
-     *            A function to test each source element for a condition; the
-     *            second parameter of the function represents the index of the
-     *            source element.
-     * @return An {@link IEnumerable} that contains the elements from the input
-     *         sequence that occur before the element at which the test no
-     *         longer passes.
-     */
-    public static <TSource> IEnumerable<TSource> takeWhile(Iterable<TSource> source,
-        BiFunction<TSource, Integer, Boolean> predicate)
-    {
-        if (source == null)
-        {
-            throw new IllegalArgumentException("source is null.");
-        }
-        if (predicate == null)
-        {
-            throw new IllegalArgumentException("predicate is null.");
-        }
-
-        return new EnumerableAdapter<>(() -> new TakeWhileEnumerator<TSource>(source)
-        {
-            @Override
-            public boolean take(TSource item, int index)
-            {
-                return predicate.apply(item, index);
-            }
-        });
-    }
-
-    private static abstract class TakeWhileEnumerator<TSource> extends SimpleIterator<TSource>
-    {
-        public TakeWhileEnumerator(Iterable<TSource> source)
-        {
-            sourceIterator = source.iterator();
-        }
-
-        private Iterator<TSource> sourceIterator;
-        private int index;
-        private boolean isTaking = true;
-
-        @Override
-        public boolean moveNext()
-        {
-            if (isTaking && sourceIterator.hasNext())
-            {
-                TSource item = sourceIterator.next();
-                if (take(item, index++))
-                {
-                    setCurrent(item);
-                    return true;
-                }
-
-                isTaking = false;
-            }
-
-            return false;
-        }
-
-        public abstract boolean take(TSource item, int index);
-    }
-
-    // endregion
-
-    // region: Union
-
-    /**
-     * Produces the set union of two sequences by using the default equality
-     * comparer.
-     *
-     * @param <TSource>
-     *            The type of the elements of the input sequences.
-     * @param first
-     *            An {@link Iterable} whose distinct elements form the first set
-     *            for the union.
-     * @param second
-     *            An {@link Iterable} whose distinct elements form the second
-     *            set for the union.
-     * @return An {@link IEnumerable} that contains the elements from both input
-     *         sequences, excluding duplicates.
-     */
-    public static <TSource> IEnumerable<TSource> union(Iterable<TSource> first, Iterable<TSource> second)
-    {
-        if (first == null)
-        {
-            throw new IllegalArgumentException("first is null.");
-        }
-        if (second == null)
-        {
-            throw new IllegalArgumentException("second is null.");
-        }
-
-        return new EnumerableAdapter<>(() -> new UnionIterator<>(first, second));
-    }
-
-    private static class UnionIterator<TSource> extends SimpleIterator<TSource>
-    {
-        public UnionIterator(Iterable<TSource> first, Iterable<TSource> second)
-        {
-            firstIterator = first.iterator();
-            secondIterator = second.iterator();
-        }
-
-        private Iterator<TSource> firstIterator;
-        private Iterator<TSource> secondIterator;
-
-        private HashSet<TSource> set = new HashSet<TSource>();
-
-        @Override
-        public boolean moveNext()
-        {
-            while (firstIterator.hasNext())
-            {
-                TSource element = firstIterator.next();
-                if (set.add(element))
-                {
-                    setCurrent(element);
-                    return true;
-                }
-            }
-
-            while (secondIterator.hasNext())
-            {
-                TSource element = secondIterator.next();
-                if (set.add(element))
-                {
-                    setCurrent(element);
-                    return true;
-                }
-            }
-
-            return false;
-        }
-    }
-
-    // endregion
-
-    // region: Where
-
-    /**
-     * Filters a sequence of values based on a predicate.
-     *
-     * @param <TSource>
-     *            The type of the elements of <code>source</code>.
-     * @param source
-     *            An {@link Iterable} to filter.
-     * @param predicate
-     *            A function to test each element for a condition.
-     * @return An {@link Iterable} that contains elements from the input
-     *         sequence that satisfy the condition.
-     */
-    public static <TSource> IEnumerable<TSource> where(Iterable<TSource> source, Function<TSource, Boolean> predicate)
-    {
-        if (source == null)
-        {
-            throw new IllegalArgumentException("source is null.");
-        }
-        if (predicate == null)
-        {
-            throw new IllegalArgumentException("predicate is null.");
-        }
-
-        return new EnumerableAdapter<>(() -> new WhereEnumerator<TSource>(source.iterator())
-        {
-            @Override
-            public boolean include(TSource item, int index)
-            {
-                return predicate.apply(item);
-            }
-        });
-    }
-
-    /**
-     * Filters a sequence of values based on a predicate. Each element's index
-     * is used in the logic of the predicate function.
-     *
-     * @param <TSource>
-     *            The type of the elements of <code>source</code>.
-     * @param source
-     *            An {@link Iterable} to filter.
-     * @param predicate
-     *            A function to test each source element for a condition; the
-     *            second parameter of the function represents the index of the
-     *            source element.
-     * @return An {@link Iterable} that contains elements from the input
-     *         sequence that satisfy the condition.
-     */
-    public static <TSource> IEnumerable<TSource> where(Iterable<TSource> source,
-        BiFunction<TSource, Integer, Boolean> predicate)
-    {
-        if (source == null)
-        {
-            throw new IllegalArgumentException("source is null.");
-        }
-        if (predicate == null)
-        {
-            throw new IllegalArgumentException("predicate is null.");
-        }
-
-        return new EnumerableAdapter<>(() -> new WhereEnumerator<TSource>(source.iterator())
-        {
-            @Override
-            public boolean include(TSource item, int index)
-            {
-                return predicate.apply(item, index);
-            }
-        });
-    }
-
-    private static abstract class WhereEnumerator<T> extends SimpleIterator<T>
-    {
-        public WhereEnumerator(Iterator<T> source)
-        {
-            this.source = source;
-        }
-
-        private Iterator<T> source;
-        private int index;
-
-        @Override
-        public boolean moveNext()
-        {
-            while (source.hasNext())
-            {
-                T item = source.next();
-                if (include(item, index++))
-                {
-                    setCurrent(item);
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public abstract boolean include(T item, int index);
     }
 
     // endregion
