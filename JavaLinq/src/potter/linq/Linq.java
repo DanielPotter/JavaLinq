@@ -1522,6 +1522,593 @@ public class Linq
 
     // endregion
 
+    // region: Metrics
+
+    // region: Average
+
+    /**
+     * Computes the average of a sequence of {@link Double} values.
+     *
+     * @param source
+     *            A sequence of {@link Double} values of which to calculate the
+     *            average.
+     * @return The average of the sequence of values.
+     */
+    public static double averageDouble(Iterable<Double> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        Double sum = 0d;
+        int count = 0;
+
+        for (Double value : source)
+        {
+            count++;
+            sum += value;
+        }
+
+        return sum / count;
+    }
+
+    /**
+     * Computes the average of the sequence of {@link Double} values that are
+     * obtained by invoking a transform function on each element of the input
+     * sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            A sequence of values of which to calculate the average.
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The average of the sequence of values.
+     */
+    public static <TSource> double averageDouble(Iterable<TSource> source, Function<TSource, Double> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        Double sum = 0d;
+        int count = 0;
+
+        for (TSource item : source)
+        {
+            Double value = selector.apply(item);
+            count++;
+            sum += value;
+        }
+
+        return sum / count;
+    }
+
+    /**
+     * Computes the average of a sequence of {@link Float} values.
+     *
+     * @param source
+     *            A sequence of {@link Float} values of which to calculate the
+     *            average.
+     * @return The average of the sequence of values.
+     */
+    public static float averageFloat(Iterable<Float> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        Float sum = 0f;
+        int count = 0;
+
+        for (Float value : source)
+        {
+            count++;
+            sum += value;
+        }
+
+        return sum / count;
+    }
+
+    /**
+     * Computes the average of the sequence of {@link Float} values that are
+     * obtained by invoking a transform function on each element of the input
+     * sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            A sequence of values of which to calculate the average.
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The average of the sequence of values.
+     */
+    public static <TSource> float averageFloat(Iterable<TSource> source, Function<TSource, Float> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        Float sum = 0f;
+        int count = 0;
+
+        for (TSource item : source)
+        {
+            Float value = selector.apply(item);
+            count++;
+            sum += value;
+        }
+
+        return sum / count;
+    }
+
+    /**
+     * Computes the average of a sequence of {@link Integer} values.
+     *
+     * @param source
+     *            A sequence of {@link Integer} values of which to calculate the
+     *            average.
+     * @return The average of the sequence of values.
+     */
+    public static int averageInteger(Iterable<Integer> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        Integer sum = 0;
+        int count = 0;
+
+        for (Integer value : source)
+        {
+            count++;
+            sum += value;
+        }
+
+        return sum / count;
+    }
+
+    /**
+     * Computes the average of the sequence of {@link Integer} values that are
+     * obtained by invoking a transform function on each element of the input
+     * sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            A sequence of values of which to calculate the average.
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The average of the sequence of values.
+     */
+    public static <TSource> int averageInteger(Iterable<TSource> source, Function<TSource, Integer> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        Integer sum = 0;
+        int count = 0;
+
+        for (TSource item : source)
+        {
+            Integer value = selector.apply(item);
+            count++;
+            sum += value;
+        }
+
+        return sum / count;
+    }
+
+    /**
+     * Computes the average of a sequence of {@link Long} values.
+     *
+     * @param source
+     *            A sequence of {@link Long} values of which to calculate the
+     *            average.
+     * @return The average of the sequence of values.
+     */
+    public static long averageLong(Iterable<Long> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        Long sum = 0l;
+        int count = 0;
+
+        for (Long value : source)
+        {
+            count++;
+            sum += value;
+        }
+
+        return sum / count;
+    }
+
+    /**
+     * Computes the average of the sequence of {@link Long} values that are
+     * obtained by invoking a transform function on each element of the input
+     * sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            A sequence of values of which to calculate the average.
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The average of the sequence of values.
+     */
+    public static <TSource> long averageLong(Iterable<TSource> source, Function<TSource, Long> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        Long sum = 0l;
+        int count = 0;
+
+        for (TSource item : source)
+        {
+            Long value = selector.apply(item);
+            count++;
+            sum += value;
+        }
+
+        return sum / count;
+    }
+
+    // endregion
+
+    // region: Sum
+
+    /**
+     * Computes the sum of a sequence of {@link Double} values.
+     *
+     * @param source
+     *            A sequence of {@link Double} values of which to calculate the
+     *            sum.
+     * @return The sum of the values in the sequence.
+     */
+    public static double sumDouble(Iterable<Double> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        Double sum = 0d;
+
+        for (Double value : source)
+        {
+            sum += value;
+        }
+
+        return sum;
+    }
+
+    /**
+     * Computes the sum of the sequence of {@link Double} values that are
+     * obtained by invoking a transform function on each element of the input
+     * sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            A sequence of values of which to calculate the sum.
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The sum of the projected values.
+     */
+    public static <TSource> double sumDouble(Iterable<TSource> source, Function<TSource, Double> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        Double sum = 0d;
+
+        for (TSource item : source)
+        {
+            Double value = selector.apply(item);
+            sum += value;
+        }
+
+        return sum;
+    }
+
+    /**
+     * Computes the sum of a sequence of {@link Float} values.
+     *
+     * @param source
+     *            A sequence of {@link Float} values of which to calculate the
+     *            sum.
+     * @return The sum of the values in the sequence.
+     */
+    public static float sumFloat(Iterable<Float> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        Float sum = 0f;
+
+        for (Float value : source)
+        {
+            sum += value;
+        }
+
+        return sum;
+    }
+
+    /**
+     * Computes the sum of the sequence of {@link Float} values that are
+     * obtained by invoking a transform function on each element of the input
+     * sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            A sequence of values of which to calculate the sum.
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The sum of the projected values.
+     */
+    public static <TSource> float sumFloat(Iterable<TSource> source, Function<TSource, Float> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        Float sum = 0f;
+
+        for (TSource item : source)
+        {
+            Float value = selector.apply(item);
+            sum += value;
+        }
+
+        return sum;
+    }
+
+    /**
+     * Computes the sum of a sequence of {@link Integer} values.
+     *
+     * @param source
+     *            A sequence of {@link Integer} values of which to calculate the
+     *            sum.
+     * @return The sum of the values in the sequence.
+     */
+    public static int sumInteger(Iterable<Integer> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        Integer sum = 0;
+
+        for (Integer value : source)
+        {
+            sum += value;
+        }
+
+        return sum;
+    }
+
+    /**
+     * Computes the sum of the sequence of {@link Integer} values that are
+     * obtained by invoking a transform function on each element of the input
+     * sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            A sequence of values of which to calculate the sum.
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The sum of the projected values.
+     */
+    public static <TSource> int sumInteger(Iterable<TSource> source, Function<TSource, Integer> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        Integer sum = 0;
+
+        for (TSource item : source)
+        {
+            Integer value = selector.apply(item);
+            sum += value;
+        }
+
+        return sum;
+    }
+
+    /**
+     * Computes the sum of a sequence of {@link Long} values.
+     *
+     * @param source
+     *            A sequence of {@link Long} values of which to calculate the
+     *            sum.
+     * @return The sum of the values in the sequence.
+     */
+    public static long sumLong(Iterable<Long> source)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        Long sum = 0l;
+
+        for (Long value : source)
+        {
+            sum += value;
+        }
+
+        return sum;
+    }
+
+    /**
+     * Computes the sum of the sequence of {@link Long} values that are obtained
+     * by invoking a transform function on each element of the input sequence.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            A sequence of values of which to calculate the sum.
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The sum of the projected values.
+     */
+    public static <TSource> long sumLong(Iterable<TSource> source, Function<TSource, Long> selector)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (selector == null)
+        {
+            throw new IllegalArgumentException("selector is null.");
+        }
+
+        if (source.iterator().hasNext() == false)
+        {
+            throw new IllegalStateException("source contains no elements.");
+        }
+
+        Long sum = 0l;
+
+        for (TSource item : source)
+        {
+            Long value = selector.apply(item);
+            sum += value;
+        }
+
+        return sum;
+    }
+
+    // endregion
+
+    // endregion
+
     // region: Mutation
 
     // region: Concat

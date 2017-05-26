@@ -516,6 +516,129 @@ public interface IEnumerable<T> extends Iterable<T>
 
     // endregion
 
+    // region: Metrics
+
+    // region: Average
+
+    /**
+     * Computes the average of the sequence of {@link Double} values that are
+     * obtained by invoking a transform function on each element of the input
+     * sequence.
+     *
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The average of the sequence of values.
+     */
+    default double averageDouble(Function<T, Double> selector)
+    {
+        return Linq.averageDouble(this, selector);
+    }
+
+    /**
+     * Computes the average of the sequence of {@link Float} values that are
+     * obtained by invoking a transform function on each element of the input
+     * sequence.
+     *
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The average of the sequence of values.
+     */
+    default float averageFloat(Function<T, Float> selector)
+    {
+        return Linq.averageFloat(this, selector);
+    }
+
+    /**
+     * Computes the average of the sequence of {@link Integer} values that are
+     * obtained by invoking a transform function on each element of the input
+     * sequence.
+     *
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The average of the sequence of values.
+     */
+    default int averageInteger(Function<T, Integer> selector)
+    {
+        return Linq.averageInteger(this, selector);
+    }
+
+    /**
+     * Computes the average of the sequence of {@link Long} values that are
+     * obtained by invoking a transform function on each element of the input
+     * sequence.
+     *
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The average of the sequence of values.
+     */
+    default long averageLong(Function<T, Long> selector)
+    {
+        return Linq.averageLong(this, selector);
+    }
+
+    // endregion
+
+    // region: Sum
+
+    /**
+     * Computes the sum of the sequence of {@link Double} values that are
+     * obtained by invoking a transform function on each element of the input
+     * sequence.
+     *
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The sum of the projected values.
+     */
+    default double sumDouble(Function<T, Double> selector)
+    {
+        return Linq.sumDouble(this, selector);
+    }
+
+    /**
+     * Computes the sum of the sequence of {@link Float} values that are
+     * obtained by invoking a transform function on each element of the input
+     * sequence.
+     *
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The sum of the projected values.
+     */
+    default float sumFloat(Function<T, Float> selector)
+    {
+        return Linq.sumFloat(this, selector);
+    }
+
+    /**
+     * Computes the sum of the sequence of {@link Integer} values that are
+     * obtained by invoking a transform function on each element of the input
+     * sequence.
+     *
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The sum of the projected values.
+     */
+    default int sumInteger(Function<T, Integer> selector)
+    {
+        return Linq.sumInteger(this, selector);
+    }
+
+    /**
+     * Computes the sum of the sequence of {@link Long} values that are obtained
+     * by invoking a transform function on each element of the input sequence.
+     *
+     * @param selector
+     *            A transform function to apply to each element.
+     * @return The sum of the projected values.
+     */
+    default long sumLong(Function<T, Long> selector)
+    {
+        return Linq.sumLong(this, selector);
+    }
+
+    // endregion
+
+    // endregion
+
     // region: Mutation
 
     // region: Concat
