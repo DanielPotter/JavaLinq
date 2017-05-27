@@ -369,6 +369,32 @@ public interface IEnumerable<T> extends Iterable<T>
 
     // endregion
 
+    // region: Zip
+
+    /**
+     * Applies a specified function to the corresponding elements of two
+     * sequences, producing a sequence of the results.
+     *
+     * @param <TSecond>
+     *            The type of the elements of the second input sequence.
+     * @param <TResult>
+     *            The type of the elements of the result sequence.
+     * @param second
+     *            The second sequence to merge.
+     * @param resultSelector
+     *            A function that specifies how to merge the elements from the
+     *            two sequences.
+     * @return An {@link IEnumerable} that contains merged elements of two input
+     *         sequences.
+     */
+    default <TSecond, TResult> IEnumerable<TResult> zip(Iterable<TSecond> second,
+        BiFunction<T, TSecond, TResult> resultSelector)
+    {
+        return Linq.zip(this, second, resultSelector);
+    }
+
+    // endregion
+
     // endregion
 
     // region: Sorting

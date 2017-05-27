@@ -1315,6 +1315,82 @@ public class Linq
 
     // endregion
 
+    // region: Zip
+
+    /**
+     * Applies a specified function to the corresponding elements of two
+     * sequences, producing a sequence of the results.
+     *
+     * @param <TFirst>
+     *            The type of the elements of the first input sequence.
+     * @param <TSecond>
+     *            The type of the elements of the second input sequence.
+     * @param <TResult>
+     *            The type of the elements of the result sequence.
+     * @param first
+     *            The first sequence to merge.
+     * @param second
+     *            The second sequence to merge.
+     * @param resultSelector
+     *            A function that specifies how to merge the elements from the
+     *            two sequences.
+     * @return An {@link IEnumerable} that contains merged elements of two input
+     *         sequences.
+     */
+    public static <TFirst, TSecond, TResult> IEnumerable<TResult> zip(Iterable<TFirst> first, Iterable<TSecond> second,
+        BiFunction<TFirst, TSecond, TResult> resultSelector)
+    {
+        if (first == null)
+        {
+            throw new IllegalArgumentException("first is null.");
+        }
+        if (second == null)
+        {
+            throw new IllegalArgumentException("second is null.");
+        }
+        if (resultSelector == null)
+        {
+            throw new IllegalArgumentException("resultSelector is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new ZipIterator<TFirst, TSecond, TResult>(first, second)
+        {
+            @Override
+            public TResult combine(TFirst first, TSecond second)
+            {
+                return resultSelector.apply(first, second);
+            }
+        });
+    }
+
+    private static abstract class ZipIterator<TFirst, TSecond, TResult> extends SimpleIterator<TResult>
+    {
+        public ZipIterator(Iterable<TFirst> first, Iterable<TSecond> second)
+        {
+            firstIterator = first.iterator();
+            secondIterator = second.iterator();
+        }
+
+        private Iterator<TFirst> firstIterator;
+        private Iterator<TSecond> secondIterator;
+
+        @Override
+        public boolean moveNext()
+        {
+            if (firstIterator.hasNext() && secondIterator.hasNext())
+            {
+                setCurrent(combine(firstIterator.next(), secondIterator.next()));
+                return true;
+            }
+
+            return false;
+        }
+
+        public abstract TResult combine(TFirst first, TSecond second);
+    }
+
+    // endregion
+
     // endregion
 
     // region: Sorting
