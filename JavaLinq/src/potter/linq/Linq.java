@@ -94,7 +94,7 @@ public class Linq
         return EmptyEnumerable.getInstance(type);
     }
 
-    private static class EmptyEnumerable<TElement> implements IEnumerable<TElement>
+    static class EmptyEnumerable<TElement> implements IEnumerable<TElement>
     {
         @SuppressWarnings("rawtypes")
         private static HashMap<Class, IEnumerable> cachedEnumerables = new HashMap<Class, IEnumerable>();
@@ -1854,6 +1854,443 @@ public class Linq
             }
 
             return descending ? -order : order;
+        }
+    }
+
+    // endregion
+
+    // endregion
+
+    // region: Grouping
+
+    // region: Group By
+
+    /**
+     * Groups the elements of a sequence according to a specified key selector
+     * function.
+     * 
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param source
+     *            An {@link Iterable} with the elements to group.
+     * @param keySelector
+     *            A function to extract the key for each element.
+     * @param keyType
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param elementType
+     *            The type of the elements of <code>source</code>.
+     * @return An {@link IEnumerable} where each {@link IGrouping} object
+     *         contains a sequence of objects and a key.
+     */
+    public static <TSource, TKey> IEnumerable<IGrouping<TKey, TSource>> groupBy(Iterable<TSource> source,
+        Function<TSource, TKey> keySelector,
+        Class<TKey> keyType,
+        Class<TSource> elementType)
+    {
+        return new GroupedEnumerable<TSource, TKey, TSource>(source,
+            keySelector, x -> x,
+            null, keyType, elementType);
+    }
+
+    /**
+     * Groups the elements of a sequence according to a specified key selector
+     * function and compares the keys by using a specified comparer.
+     * 
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param source
+     *            An {@link Iterable} with the elements to group.
+     * @param keySelector
+     *            A function to extract the key for each element.
+     * @param comparer
+     *            An {@link IEqualityComparer} with which to compare keys.
+     * @param keyType
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param elementType
+     *            The type of the elements of <code>source</code>.
+     * @return An {@link IEnumerable} where each {@link IGrouping} object
+     *         contains a sequence of objects and a key.
+     */
+    public static <TSource, TKey> IEnumerable<IGrouping<TKey, TSource>> groupBy(Iterable<TSource> source,
+        Function<TSource, TKey> keySelector,
+        IEqualityComparer<TKey> comparer,
+        Class<TKey> keyType,
+        Class<TSource> elementType)
+    {
+        return new GroupedEnumerable<TSource, TKey, TSource>(source,
+            keySelector, x -> x,
+            comparer, keyType, elementType);
+    }
+
+    /**
+     * Groups the elements of a sequence according to a specified key selector
+     * function and projects the elements for each group by using a specified
+     * function.
+     * 
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param <TElement>
+     *            The type of the elements in the {@link IGrouping}.
+     * @param source
+     *            An {@link Iterable} with the elements to group.
+     * @param keySelector
+     *            A function to extract the key for each element.
+     * @param elementSelector
+     *            A function to map each source element to an element in the
+     *            {@link IGrouping}.
+     * @param keyType
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param elementType
+     *            The type of the elements in the {@link IGrouping}.
+     * @return An {@link IEnumerable} where each {@link IGrouping} object
+     *         contains a collection of objects of type <code>TElement</code>
+     *         and a key.
+     */
+    public static <TSource, TKey, TElement> IEnumerable<IGrouping<TKey, TElement>> groupBy(Iterable<TSource> source,
+        Function<TSource, TKey> keySelector,
+        Function<TSource, TElement> elementSelector,
+        Class<TKey> keyType,
+        Class<TElement> elementType)
+    {
+        return new GroupedEnumerable<TSource, TKey, TElement>(source,
+            keySelector, elementSelector,
+            null, keyType, elementType);
+    }
+
+    /**
+     * Groups the elements of a sequence according to a key selector function.
+     * The keys are compared by using a comparer and each group's elements are
+     * projected by using a specified function.
+     * 
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param <TElement>
+     *            The type of the elements in the {@link IGrouping}.
+     * @param source
+     *            An {@link Iterable} with the elements to group.
+     * @param keySelector
+     *            A function to extract the key for each element.
+     * @param elementSelector
+     *            A function to map each source element to an element in the
+     *            {@link IGrouping}.
+     * @param comparer
+     *            An {@link IEqualityComparer} with which to compare keys.
+     * @param keyType
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param elementType
+     *            The type of the elements in the {@link IGrouping}.
+     * @return An {@link IEnumerable} where each {@link IGrouping} object
+     *         contains a collection of objects of type <code>TElement</code>
+     *         and a key.
+     */
+    public static <TSource, TKey, TElement> IEnumerable<IGrouping<TKey, TElement>> groupBy(Iterable<TSource> source,
+        Function<TSource, TKey> keySelector,
+        Function<TSource, TElement> elementSelector,
+        IEqualityComparer<TKey> comparer,
+        Class<TKey> keyType,
+        Class<TElement> elementType)
+    {
+        return new GroupedEnumerable<TSource, TKey, TElement>(source,
+            keySelector, elementSelector,
+            comparer, keyType, elementType);
+    }
+
+    /**
+     * Groups the elements of a sequence according to a specified key selector
+     * function and creates a result value from each group and its key.
+     * 
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param <TResult>
+     *            The type of the result value returned by
+     *            <code>resultSelector</code>.
+     * @param source
+     *            An {@link Iterable} with the elements to group.
+     * @param keySelector
+     *            A function to extract the key for each element.
+     * @param resultSelector
+     *            A function to create a result value from each group.
+     * @param keyType
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param elementType
+     *            The type of the elements of <code>source</code>.
+     * @return A collection of elements of type <code>TResult</code> where each
+     *         element represents a projection over a group and its key.
+     */
+    public static <TSource, TKey, TResult> IEnumerable<TResult> groupBy(Iterable<TSource> source,
+        Function<TSource, TKey> keySelector,
+        BiFunction<TKey, IEnumerable<TSource>, TResult> resultSelector,
+        Class<TKey> keyType,
+        Class<TSource> elementType)
+    {
+        return new GroupedResultEnumerable<TSource, TKey, TSource, TResult>(source,
+            keySelector, x -> x, resultSelector,
+            null, keyType, elementType);
+    }
+
+    /**
+     * Groups the elements of a sequence according to a specified key selector
+     * function and creates a result value from each group and its key. The keys
+     * are compared by using a specified comparer.
+     * 
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param <TResult>
+     *            The type of the result value returned by
+     *            <code>resultSelector</code>.
+     * @param source
+     *            An {@link Iterable} with the elements to group.
+     * @param keySelector
+     *            A function to extract the key for each element.
+     * @param resultSelector
+     *            A function to create a result value from each group.
+     * @param comparer
+     *            An {@link IEqualityComparer} with which to compare keys.
+     * @param keyType
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param elementType
+     *            The type of the elements of <code>source</code>.
+     * @return A collection of elements of type <code>TResult</code> where each
+     *         element represents a projection over a group and its key.
+     */
+    public static <TSource, TKey, TResult> IEnumerable<TResult> groupBy(Iterable<TSource> source,
+        Function<TSource, TKey> keySelector,
+        BiFunction<TKey, IEnumerable<TSource>, TResult> resultSelector,
+        IEqualityComparer<TKey> comparer,
+        Class<TKey> keyType,
+        Class<TSource> elementType)
+    {
+        return new GroupedResultEnumerable<TSource, TKey, TSource, TResult>(source,
+            keySelector, x -> x, resultSelector,
+            comparer, keyType, elementType);
+    }
+
+    /**
+     * Groups the elements of a sequence according to a specified key selector
+     * function and creates a result value from each group and its key. The
+     * elements of each group are projected by using a specified function.
+     * 
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param <TElement>
+     *            The type of the elements in the {@link IGrouping}.
+     * @param <TResult>
+     *            The type of the result value returned by
+     *            <code>resultSelector</code>.
+     * @param source
+     *            An {@link Iterable} with the elements to group.
+     * @param keySelector
+     *            A function to extract the key for each element.
+     * @param elementSelector
+     *            A function to map each source element to an element in the
+     *            {@link IGrouping}.
+     * @param resultSelector
+     *            A function to create a result value from each group.
+     * @param keyType
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param elementType
+     *            The type of the elements of <code>source</code>.
+     * @return A collection of elements of type <code>TResult</code> where each
+     *         element represents a projection over a group and its key.
+     */
+    public static <TSource, TKey, TElement, TResult> IEnumerable<TResult> groupBy(Iterable<TSource> source,
+        Function<TSource, TKey> keySelector,
+        Function<TSource, TElement> elementSelector,
+        BiFunction<TKey, IEnumerable<TElement>, TResult> resultSelector,
+        Class<TKey> keyType,
+        Class<TElement> elementType)
+    {
+        return new GroupedResultEnumerable<TSource, TKey, TElement, TResult>(source,
+            keySelector, elementSelector, resultSelector,
+            null, keyType, elementType);
+    }
+
+    /**
+     * Groups the elements of a sequence according to a specified key selector
+     * function and creates a result value from each group and its key. Key
+     * values are compared by using a specified comparer, and the elements of
+     * each group are projected by using a specified function.
+     * 
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param <TElement>
+     *            The type of the elements in the {@link IGrouping}.
+     * @param <TResult>
+     *            The type of the result value returned by
+     *            <code>resultSelector</code>.
+     * @param source
+     *            An {@link Iterable} with the elements to group.
+     * @param keySelector
+     *            A function to extract the key for each element.
+     * @param elementSelector
+     *            A function to map each source element to an element in the
+     *            {@link IGrouping}.
+     * @param resultSelector
+     *            A function to create a result value from each group.
+     * @param comparer
+     *            An {@link IEqualityComparer} with which to compare keys.
+     * @param keyType
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param elementType
+     *            The type of the elements of <code>source</code>.
+     * @return A collection of elements of type <code>TResult</code> where each
+     *         element represents a projection over a group and its key.
+     */
+    public static <TSource, TKey, TElement, TResult> IEnumerable<TResult> groupBy(Iterable<TSource> source,
+        Function<TSource, TKey> keySelector,
+        Function<TSource, TElement> elementSelector,
+        BiFunction<TKey, IEnumerable<TElement>, TResult> resultSelector,
+        IEqualityComparer<TKey> comparer,
+        Class<TKey> keyType,
+        Class<TElement> elementType)
+    {
+        return new GroupedResultEnumerable<TSource, TKey, TElement, TResult>(source,
+            keySelector, elementSelector, resultSelector,
+            comparer, keyType, elementType);
+    }
+
+    // endregion
+
+    // region: Grouped Enumerable
+
+    private static class GroupedEnumerable<TSource, TKey, TElement> implements IEnumerable<IGrouping<TKey, TElement>>
+    {
+        private final Iterable<TSource> source;
+        private final Function<TSource, TKey> keySelector;
+        private final Function<TSource, TElement> elementSelector;
+        private final IEqualityComparer<TKey> comparer;
+        private final Class<TKey> keyType;
+        private final Class<TElement> elementType;
+
+        public GroupedEnumerable(Iterable<TSource> source,
+            Function<TSource, TKey> keySelector,
+            Function<TSource, TElement> elementSelector,
+            IEqualityComparer<TKey> comparer,
+            Class<TKey> keyType,
+            Class<TElement> elementType)
+        {
+            if (source == null)
+            {
+                throw new IllegalArgumentException("source is null.");
+            }
+            if (keySelector == null)
+            {
+                throw new IllegalArgumentException("keySelector is null.");
+            }
+            if (elementSelector == null)
+            {
+                throw new IllegalArgumentException("elementSelector is null.");
+            }
+            if (keyType == null)
+            {
+                throw new IllegalArgumentException("keyType is null.");
+            }
+            if (elementType == null)
+            {
+                throw new IllegalArgumentException("elementType is null.");
+            }
+
+            this.source = source;
+            this.keySelector = keySelector;
+            this.elementSelector = elementSelector;
+            this.comparer = comparer;
+            this.keyType = keyType;
+            this.elementType = elementType;
+        }
+
+        @Override
+        public IEnumerator<IGrouping<TKey, TElement>> getEnumerator()
+        {
+            return Lookup.create(source, keySelector, elementSelector, comparer, keyType, elementType).getEnumerator();
+        }
+
+        @Override
+        public Iterator<IGrouping<TKey, TElement>> iterator()
+        {
+            return getEnumerator();
+        }
+    }
+
+    private static class GroupedResultEnumerable<TSource, TKey, TElement, TResult> implements IEnumerable<TResult>
+    {
+        private final Iterable<TSource> source;
+        private final Function<TSource, TKey> keySelector;
+        private final Function<TSource, TElement> elementSelector;
+        private final IEqualityComparer<TKey> comparer;
+        private final BiFunction<TKey, IEnumerable<TElement>, TResult> resultSelector;
+        private final Class<TKey> keyType;
+        private final Class<TElement> elementType;
+
+        public GroupedResultEnumerable(Iterable<TSource> source,
+            Function<TSource, TKey> keySelector,
+            Function<TSource, TElement> elementSelector,
+            BiFunction<TKey, IEnumerable<TElement>, TResult> resultSelector,
+            IEqualityComparer<TKey> comparer,
+            Class<TKey> keyType,
+            Class<TElement> elementType)
+        {
+            if (source == null)
+            {
+                throw new IllegalArgumentException("source is null.");
+            }
+            if (keySelector == null)
+            {
+                throw new IllegalArgumentException("keySelector is null.");
+            }
+            if (elementSelector == null)
+            {
+                throw new IllegalArgumentException("elementSelector is null.");
+            }
+            if (resultSelector == null)
+            {
+                throw new IllegalArgumentException("resultSelector is null.");
+            }
+            if (keyType == null)
+            {
+                throw new IllegalArgumentException("keyType is null.");
+            }
+            if (elementType == null)
+            {
+                throw new IllegalArgumentException("elementType is null.");
+            }
+
+            this.source = source;
+            this.keySelector = keySelector;
+            this.elementSelector = elementSelector;
+            this.comparer = comparer;
+            this.resultSelector = resultSelector;
+            this.keyType = keyType;
+            this.elementType = elementType;
+        }
+
+        @Override
+        public IEnumerator<TResult> getEnumerator()
+        {
+            Lookup<TKey, TElement> lookup
+                = Lookup.create(source, keySelector, elementSelector, comparer, keyType, elementType);
+            return lookup.applyResultSelector(resultSelector).getEnumerator();
+        }
+
+        @Override
+        public Iterator<TResult> iterator()
+        {
+            return getEnumerator();
         }
     }
 

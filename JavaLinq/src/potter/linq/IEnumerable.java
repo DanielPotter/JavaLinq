@@ -481,6 +481,266 @@ public interface IEnumerable<T> extends Iterable<T>
 
     // endregion
 
+    // region: Grouping
+
+    // region: Group By
+
+    /**
+     * Groups the elements of a sequence according to a specified key selector
+     * function.
+     * 
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param keySelector
+     *            A function to extract the key for each element.
+     * @param keyType
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param elementType
+     *            The type of the elements of <code>source</code>.
+     * @return An {@link IEnumerable} where each {@link IGrouping} object
+     *         contains a sequence of objects and a key.
+     */
+    default <TKey> IEnumerable<IGrouping<TKey, T>> groupBy(
+        Function<T, TKey> keySelector,
+        Class<TKey> keyType,
+        Class<T> elementType)
+    {
+        return Linq.groupBy(this, keySelector, keyType, elementType);
+    }
+
+    /**
+     * Groups the elements of a sequence according to a specified key selector
+     * function and compares the keys by using a specified comparer.
+     * 
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param keySelector
+     *            A function to extract the key for each element.
+     * @param comparer
+     *            An {@link IEqualityComparer} with which to compare keys.
+     * @param keyType
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param elementType
+     *            The type of the elements of <code>source</code>.
+     * @return An {@link IEnumerable} where each {@link IGrouping} object
+     *         contains a sequence of objects and a key.
+     */
+    default <TKey> IEnumerable<IGrouping<TKey, T>> groupBy(
+        Function<T, TKey> keySelector,
+        IEqualityComparer<TKey> comparer,
+        Class<TKey> keyType,
+        Class<T> elementType)
+    {
+        return Linq.groupBy(this, keySelector, comparer, keyType, elementType);
+    }
+
+    /**
+     * Groups the elements of a sequence according to a specified key selector
+     * function and projects the elements for each group by using a specified
+     * function.
+     * 
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param <TElement>
+     *            The type of the elements in the {@link IGrouping}.
+     * @param keySelector
+     *            A function to extract the key for each element.
+     * @param elementSelector
+     *            A function to map each source element to an element in the
+     *            {@link IGrouping}.
+     * @param keyType
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param elementType
+     *            The type of the elements in the {@link IGrouping}.
+     * @return An {@link IEnumerable} where each {@link IGrouping} object
+     *         contains a collection of objects of type <code>TElement</code>
+     *         and a key.
+     */
+    default <TKey, TElement> IEnumerable<IGrouping<TKey, TElement>> groupBy(
+        Function<T, TKey> keySelector,
+        Function<T, TElement> elementSelector,
+        Class<TKey> keyType,
+        Class<TElement> elementType)
+    {
+        return Linq.groupBy(this, keySelector, elementSelector, keyType, elementType);
+    }
+
+    /**
+     * Groups the elements of a sequence according to a key selector function.
+     * The keys are compared by using a comparer and each group's elements are
+     * projected by using a specified function.
+     * 
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param <TElement>
+     *            The type of the elements in the {@link IGrouping}.
+     * @param keySelector
+     *            A function to extract the key for each element.
+     * @param elementSelector
+     *            A function to map each source element to an element in the
+     *            {@link IGrouping}.
+     * @param comparer
+     *            An {@link IEqualityComparer} with which to compare keys.
+     * @param keyType
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param elementType
+     *            The type of the elements in the {@link IGrouping}.
+     * @return An {@link IEnumerable} where each {@link IGrouping} object
+     *         contains a collection of objects of type <code>TElement</code>
+     *         and a key.
+     */
+    default <TKey, TElement> IEnumerable<IGrouping<TKey, TElement>> groupBy(
+        Function<T, TKey> keySelector,
+        Function<T, TElement> elementSelector,
+        IEqualityComparer<TKey> comparer,
+        Class<TKey> keyType,
+        Class<TElement> elementType)
+    {
+        return Linq.groupBy(this, keySelector, elementSelector, comparer, keyType, elementType);
+    }
+
+    /**
+     * Groups the elements of a sequence according to a specified key selector
+     * function and creates a result value from each group and its key.
+     * 
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param <TResult>
+     *            The type of the result value returned by
+     *            <code>resultSelector</code>.
+     * @param keySelector
+     *            A function to extract the key for each element.
+     * @param resultSelector
+     *            A function to create a result value from each group.
+     * @param keyType
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param elementType
+     *            The type of the elements of <code>source</code>.
+     * @return A collection of elements of type <code>TResult</code> where each
+     *         element represents a projection over a group and its key.
+     */
+    default <TKey, TResult> IEnumerable<TResult> groupBy(
+        Function<T, TKey> keySelector,
+        BiFunction<TKey, IEnumerable<T>, TResult> resultSelector,
+        Class<TKey> keyType,
+        Class<T> elementType)
+    {
+        return Linq.groupBy(this, keySelector, resultSelector, keyType, elementType);
+    }
+
+    /**
+     * Groups the elements of a sequence according to a specified key selector
+     * function and creates a result value from each group and its key. The keys
+     * are compared by using a specified comparer.
+     * 
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param <TResult>
+     *            The type of the result value returned by
+     *            <code>resultSelector</code>.
+     * @param keySelector
+     *            A function to extract the key for each element.
+     * @param resultSelector
+     *            A function to create a result value from each group.
+     * @param comparer
+     *            An {@link IEqualityComparer} with which to compare keys.
+     * @param keyType
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param elementType
+     *            The type of the elements of <code>source</code>.
+     * @return A collection of elements of type <code>TResult</code> where each
+     *         element represents a projection over a group and its key.
+     */
+    default <TKey, TResult> IEnumerable<TResult> groupBy(
+        Function<T, TKey> keySelector,
+        BiFunction<TKey, IEnumerable<T>, TResult> resultSelector,
+        IEqualityComparer<TKey> comparer,
+        Class<TKey> keyType,
+        Class<T> elementType)
+    {
+        return Linq.groupBy(this, keySelector, resultSelector, comparer, keyType, elementType);
+    }
+
+    /**
+     * Groups the elements of a sequence according to a specified key selector
+     * function and creates a result value from each group and its key. The
+     * elements of each group are projected by using a specified function.
+     * 
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param <TElement>
+     *            The type of the elements in the {@link IGrouping}.
+     * @param <TResult>
+     *            The type of the result value returned by
+     *            <code>resultSelector</code>.
+     * @param keySelector
+     *            A function to extract the key for each element.
+     * @param elementSelector
+     *            A function to map each source element to an element in the
+     *            {@link IGrouping}.
+     * @param resultSelector
+     *            A function to create a result value from each group.
+     * @param keyType
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param elementType
+     *            The type of the elements of <code>source</code>.
+     * @return A collection of elements of type <code>TResult</code> where each
+     *         element represents a projection over a group and its key.
+     */
+    default <TKey, TElement, TResult> IEnumerable<TResult> groupBy(
+        Function<T, TKey> keySelector,
+        Function<T, TElement> elementSelector,
+        BiFunction<TKey, IEnumerable<TElement>, TResult> resultSelector,
+        Class<TKey> keyType,
+        Class<TElement> elementType)
+    {
+        return Linq.groupBy(this, keySelector, elementSelector, resultSelector, keyType, elementType);
+    }
+
+    /**
+     * Groups the elements of a sequence according to a specified key selector
+     * function and creates a result value from each group and its key. Key
+     * values are compared by using a specified comparer, and the elements of
+     * each group are projected by using a specified function.
+     * 
+     * @param <TKey>
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param <TElement>
+     *            The type of the elements in the {@link IGrouping}.
+     * @param <TResult>
+     *            The type of the result value returned by
+     *            <code>resultSelector</code>.
+     * @param keySelector
+     *            A function to extract the key for each element.
+     * @param elementSelector
+     *            A function to map each source element to an element in the
+     *            {@link IGrouping}.
+     * @param resultSelector
+     *            A function to create a result value from each group.
+     * @param comparer
+     *            An {@link IEqualityComparer} with which to compare keys.
+     * @param keyType
+     *            The type of the key returned by <code>keySelector</code>.
+     * @param elementType
+     *            The type of the elements of <code>source</code>.
+     * @return A collection of elements of type <code>TResult</code> where each
+     *         element represents a projection over a group and its key.
+     */
+    default <TKey, TElement, TResult> IEnumerable<TResult> groupBy(
+        Function<T, TKey> keySelector,
+        Function<T, TElement> elementSelector,
+        BiFunction<TKey, IEnumerable<TElement>, TResult> resultSelector,
+        IEqualityComparer<TKey> comparer,
+        Class<TKey> keyType,
+        Class<TElement> elementType)
+    {
+        return Linq.groupBy(this, keySelector, elementSelector, resultSelector, comparer, keyType, elementType);
+    }
+
+    // endregion
+
+    // endregion
+
     // region: Aggregation
 
     // region: Aggregate

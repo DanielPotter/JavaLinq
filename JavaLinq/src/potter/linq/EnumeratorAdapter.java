@@ -32,6 +32,7 @@ class EnumeratorAdapter<T> extends SimpleIterator<T>
         if (source.hasNext())
         {
             setCurrent(source.next());
+            return true;
         }
 
         return false;
