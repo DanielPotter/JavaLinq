@@ -739,6 +739,187 @@ public interface IEnumerable<T> extends Iterable<T>
 
     // endregion
 
+    // region: Group Join
+
+    /**
+     * Correlates the elements of two sequences based on equality of keys and
+     * groups the results. The default equality comparer is used to compare
+     * keys.
+     * 
+     * @param <TInner>
+     *            The type of the elements of the second sequence.
+     * @param <TKey>
+     *            The type of the keys returned by the key selector functions.
+     * @param <TResult>
+     *            The type of the result elements.
+     * @param inner
+     *            The sequence to join to the first sequence.
+     * @param outerKeySelector
+     *            A function to extract the join key from each element of the
+     *            first sequence.
+     * @param innerKeySelector
+     *            A function to extract the join key from each element of the
+     *            second sequence.
+     * @param resultSelector
+     *            A function to create a result element from an element from the
+     *            first sequence and a collection of matching elements from the
+     *            second sequence.
+     * @param keyType
+     *            The type of the keys returned by the key selector functions.
+     * @param elementType
+     *            The type of the elements of the second sequence.
+     * @return An IEnumerable<T> that contains elements of type TResult that are
+     *         obtained by performing a grouped join on two sequences.
+     */
+    default <TInner, TKey, TResult> IEnumerable<TResult> groupJoin(
+        Iterable<TInner> inner,
+        Function<T, TKey> outerKeySelector,
+        Function<TInner, TKey> innerKeySelector,
+        BiFunction<T, IEnumerable<TInner>, TResult> resultSelector,
+        Class<TKey> keyType,
+        Class<TInner> elementType)
+    {
+        return Linq.groupJoin(this, inner,
+            outerKeySelector, innerKeySelector, resultSelector,
+            keyType, elementType);
+    }
+
+    /**
+     * Correlates the elements of two sequences based on equality of keys and
+     * groups the results. A specified {@link IEqualityComparer} is used to
+     * compare keys.
+     * 
+     * @param <TInner>
+     *            The type of the elements of the second sequence.
+     * @param <TKey>
+     *            The type of the keys returned by the key selector functions.
+     * @param <TResult>
+     *            The type of the result elements.
+     * @param inner
+     *            The sequence to join to the first sequence.
+     * @param outerKeySelector
+     *            A function to extract the join key from each element of the
+     *            first sequence.
+     * @param innerKeySelector
+     *            A function to extract the join key from each element of the
+     *            second sequence.
+     * @param resultSelector
+     *            A function to create a result element from an element from the
+     *            first sequence and a collection of matching elements from the
+     *            second sequence.
+     * @param comparer
+     *            An {@link IEqualityComparer} to hash and compare keys.
+     * @param keyType
+     *            The type of the keys returned by the key selector functions.
+     * @param elementType
+     *            The type of the elements of the second sequence.
+     * @return An IEnumerable<T> that contains elements of type TResult that are
+     *         obtained by performing a grouped join on two sequences.
+     */
+    default <TInner, TKey, TResult> IEnumerable<TResult> groupJoin(
+        Iterable<TInner> inner,
+        Function<T, TKey> outerKeySelector,
+        Function<TInner, TKey> innerKeySelector,
+        BiFunction<T, IEnumerable<TInner>, TResult> resultSelector,
+        IEqualityComparer<TKey> comparer,
+        Class<TKey> keyType,
+        Class<TInner> elementType)
+    {
+        return Linq.groupJoin(this, inner,
+            outerKeySelector, innerKeySelector, resultSelector,
+            comparer, keyType, elementType);
+    }
+
+    // endregion
+
+    // region: Join
+
+    /**
+     * Correlates the elements of two sequences based on matching keys. The
+     * default equality comparer is used to compare keys.
+     *
+     * @param <TInner>
+     *            The type of the elements of the second sequence.
+     * @param <TKey>
+     *            The type of the keys returned by the key selector functions.
+     * @param <TResult>
+     *            The type of the result elements.
+     * @param inner
+     *            The sequence to join to the first sequence.
+     * @param outerKeySelector
+     *            A function to extract the join key from each element of the
+     *            first sequence.
+     * @param innerKeySelector
+     *            A function to extract the join key from each element of the
+     *            second sequence.
+     * @param resultSelector
+     *            A function to create a result element from two matching
+     *            elements.
+     * @param keyType
+     *            The type of the keys returned by the key selector functions.
+     * @param elementType
+     *            The type of the elements of the second sequence.
+     * @return An {@link IEnumerable} that has elements of type
+     *         <code>TResult</code> that are obtained by performing an inner
+     *         join on two sequences.
+     */
+    default <TInner, TKey, TResult> IEnumerable<TResult> join(
+        Iterable<TInner> inner,
+        Function<T, TKey> outerKeySelector,
+        Function<TInner, TKey> innerKeySelector,
+        BiFunction<T, TInner, TResult> resultSelector,
+        Class<TKey> keyType,
+        Class<TInner> elementType)
+    {
+        return Linq.join(this, inner, outerKeySelector, innerKeySelector, resultSelector, keyType, elementType);
+    }
+
+    /**
+     * Correlates the elements of two sequences based on matching keys. The
+     * default equality comparer is used to compare keys.
+     *
+     * @param <TInner>
+     *            The type of the elements of the second sequence.
+     * @param <TKey>
+     *            The type of the keys returned by the key selector functions.
+     * @param <TResult>
+     *            The type of the result elements.
+     * @param inner
+     *            The sequence to join to the first sequence.
+     * @param outerKeySelector
+     *            A function to extract the join key from each element of the
+     *            first sequence.
+     * @param innerKeySelector
+     *            A function to extract the join key from each element of the
+     *            second sequence.
+     * @param resultSelector
+     *            A function to create a result element from two matching
+     *            elements.
+     * @param comparer
+     *            An {@link IEqualityComparer} to hash and compare keys.
+     * @param keyType
+     *            The type of the keys returned by the key selector functions.
+     * @param elementType
+     *            The type of the elements of the second sequence.
+     * @return An {@link IEnumerable} that has elements of type
+     *         <code>TResult</code> that are obtained by performing an inner
+     *         join on two sequences.
+     */
+    default <TInner, TKey, TResult> IEnumerable<TResult> join(
+        Iterable<TInner> inner,
+        Function<T, TKey> outerKeySelector,
+        Function<TInner, TKey> innerKeySelector,
+        BiFunction<T, TInner, TResult> resultSelector,
+        IEqualityComparer<TKey> comparer,
+        Class<TKey> keyType,
+        Class<TInner> elementType)
+    {
+        return Linq.join(this, inner, outerKeySelector, innerKeySelector, resultSelector, comparer, keyType,
+            elementType);
+    }
+
+    // endregion
+
     // endregion
 
     // region: Aggregation

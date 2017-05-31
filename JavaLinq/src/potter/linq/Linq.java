@@ -2167,6 +2167,428 @@ public class Linq
 
     // endregion
 
+    // region: Group Join
+
+    /**
+     * Correlates the elements of two sequences based on equality of keys and
+     * groups the results. The default equality comparer is used to compare
+     * keys.
+     * 
+     * @param <TOuter>
+     *            The type of the elements of the first sequence.
+     * @param <TInner>
+     *            The type of the elements of the second sequence.
+     * @param <TKey>
+     *            The type of the keys returned by the key selector functions.
+     * @param <TResult>
+     *            The type of the result elements.
+     * @param outer
+     *            The first sequence to join.
+     * @param inner
+     *            The sequence to join to the first sequence.
+     * @param outerKeySelector
+     *            A function to extract the join key from each element of the
+     *            first sequence.
+     * @param innerKeySelector
+     *            A function to extract the join key from each element of the
+     *            second sequence.
+     * @param resultSelector
+     *            A function to create a result element from an element from the
+     *            first sequence and a collection of matching elements from the
+     *            second sequence.
+     * @param keyType
+     *            The type of the keys returned by the key selector functions.
+     * @param elementType
+     *            The type of the elements of the second sequence.
+     * @return An IEnumerable<T> that contains elements of type TResult that are
+     *         obtained by performing a grouped join on two sequences.
+     */
+    public static <TOuter, TInner, TKey, TResult> IEnumerable<TResult> groupJoin(
+        Iterable<TOuter> outer,
+        Iterable<TInner> inner,
+        Function<TOuter, TKey> outerKeySelector,
+        Function<TInner, TKey> innerKeySelector,
+        BiFunction<TOuter, IEnumerable<TInner>, TResult> resultSelector,
+        Class<TKey> keyType,
+        Class<TInner> elementType)
+    {
+        if (outer == null)
+        {
+            throw new IllegalArgumentException("outer");
+        }
+        if (inner == null)
+        {
+            throw new IllegalArgumentException("inner");
+        }
+        if (outerKeySelector == null)
+        {
+            throw new IllegalArgumentException("outerKeySelector");
+        }
+        if (innerKeySelector == null)
+        {
+            throw new IllegalArgumentException("innerKeySelector");
+        }
+        if (resultSelector == null)
+        {
+            throw new IllegalArgumentException("resultSelector");
+        }
+        if (keyType == null)
+        {
+            throw new IllegalArgumentException("keyType is null.");
+        }
+        if (elementType == null)
+        {
+            throw new IllegalArgumentException("elementType is null.");
+        }
+
+        return new EnumerableAdapter<>(
+            () -> new GroupJoinIterator<>(outer, inner,
+                outerKeySelector, innerKeySelector, resultSelector,
+                null, keyType, elementType));
+    }
+
+    /**
+     * Correlates the elements of two sequences based on equality of keys and
+     * groups the results. A specified {@link IEqualityComparer} is used to
+     * compare keys.
+     * 
+     * @param <TOuter>
+     *            The type of the elements of the first sequence.
+     * @param <TInner>
+     *            The type of the elements of the second sequence.
+     * @param <TKey>
+     *            The type of the keys returned by the key selector functions.
+     * @param <TResult>
+     *            The type of the result elements.
+     * @param outer
+     *            The first sequence to join.
+     * @param inner
+     *            The sequence to join to the first sequence.
+     * @param outerKeySelector
+     *            A function to extract the join key from each element of the
+     *            first sequence.
+     * @param innerKeySelector
+     *            A function to extract the join key from each element of the
+     *            second sequence.
+     * @param resultSelector
+     *            A function to create a result element from an element from the
+     *            first sequence and a collection of matching elements from the
+     *            second sequence.
+     * @param comparer
+     *            An {@link IEqualityComparer} to hash and compare keys.
+     * @param keyType
+     *            The type of the keys returned by the key selector functions.
+     * @param elementType
+     *            The type of the elements of the second sequence.
+     * @return An IEnumerable<T> that contains elements of type TResult that are
+     *         obtained by performing a grouped join on two sequences.
+     */
+    public static <TOuter, TInner, TKey, TResult> IEnumerable<TResult> groupJoin(
+        Iterable<TOuter> outer,
+        Iterable<TInner> inner,
+        Function<TOuter, TKey> outerKeySelector,
+        Function<TInner, TKey> innerKeySelector,
+        BiFunction<TOuter, IEnumerable<TInner>, TResult> resultSelector,
+        IEqualityComparer<TKey> comparer,
+        Class<TKey> keyType,
+        Class<TInner> elementType)
+    {
+        if (outer == null)
+        {
+            throw new IllegalArgumentException("outer");
+        }
+        if (inner == null)
+        {
+            throw new IllegalArgumentException("inner");
+        }
+        if (outerKeySelector == null)
+        {
+            throw new IllegalArgumentException("outerKeySelector");
+        }
+        if (innerKeySelector == null)
+        {
+            throw new IllegalArgumentException("innerKeySelector");
+        }
+        if (resultSelector == null)
+        {
+            throw new IllegalArgumentException("resultSelector");
+        }
+        if (keyType == null)
+        {
+            throw new IllegalArgumentException("keyType is null.");
+        }
+        if (elementType == null)
+        {
+            throw new IllegalArgumentException("elementType is null.");
+        }
+
+        return new EnumerableAdapter<>(
+            () -> new GroupJoinIterator<>(outer, inner,
+                outerKeySelector, innerKeySelector, resultSelector,
+                comparer, keyType, elementType));
+    }
+
+    private static class GroupJoinIterator<TOuter, TInner, TKey, TResult> extends SimpleIterator<TResult>
+    {
+        public GroupJoinIterator(Iterable<TOuter> outer, Iterable<TInner> inner,
+            Function<TOuter, TKey> outerKeySelector, Function<TInner, TKey> innerKeySelector,
+            BiFunction<TOuter, IEnumerable<TInner>, TResult> resultSelector, IEqualityComparer<TKey> comparer,
+            Class<TKey> keyType,
+            Class<TInner> elementType)
+        {
+            lookup = Lookup.createForJoin(inner, innerKeySelector, comparer, keyType, elementType);
+            this.outerKeySelector = outerKeySelector;
+            this.resultSelector = resultSelector;
+
+            outerIterator = outer.iterator();
+        }
+
+        private final Lookup<TKey, TInner> lookup;
+        private final Function<TOuter, TKey> outerKeySelector;
+        private final BiFunction<TOuter, IEnumerable<TInner>, TResult> resultSelector;
+
+        private TOuter currentOuter;
+        private Iterator<TOuter> outerIterator;
+
+        @Override
+        public boolean moveNext()
+        {
+            while (outerIterator.hasNext())
+            {
+                currentOuter = outerIterator.next();
+                IEnumerable<TInner> innerItems = lookup.get(outerKeySelector.apply(currentOuter));
+                setCurrent(resultSelector.apply(currentOuter, innerItems));
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    // endregion
+
+    // region: Join
+
+    /**
+     * Correlates the elements of two sequences based on matching keys. The
+     * default equality comparer is used to compare keys.
+     *
+     * @param <TOuter>
+     *            The type of the elements of the first sequence.
+     * @param <TInner>
+     *            The type of the elements of the second sequence.
+     * @param <TKey>
+     *            The type of the keys returned by the key selector functions.
+     * @param <TResult>
+     *            The type of the result elements.
+     * @param outer
+     *            The first sequence to join.
+     * @param inner
+     *            The sequence to join to the first sequence.
+     * @param outerKeySelector
+     *            A function to extract the join key from each element of the
+     *            first sequence.
+     * @param innerKeySelector
+     *            A function to extract the join key from each element of the
+     *            second sequence.
+     * @param resultSelector
+     *            A function to create a result element from two matching
+     *            elements.
+     * @param keyType
+     *            The type of the keys returned by the key selector functions.
+     * @param elementType
+     *            The type of the elements of the second sequence.
+     * @return An {@link IEnumerable} that has elements of type
+     *         <code>TResult</code> that are obtained by performing an inner
+     *         join on two sequences.
+     */
+    public static <TOuter, TInner, TKey, TResult> IEnumerable<TResult> join(
+        Iterable<TOuter> outer,
+        Iterable<TInner> inner,
+        Function<TOuter, TKey> outerKeySelector,
+        Function<TInner, TKey> innerKeySelector,
+        BiFunction<TOuter, TInner, TResult> resultSelector,
+        Class<TKey> keyType,
+        Class<TInner> elementType)
+    {
+        if (outer == null)
+        {
+            throw new IllegalArgumentException("outer is null.");
+        }
+        if (inner == null)
+        {
+            throw new IllegalArgumentException("inner is null.");
+        }
+        if (outerKeySelector == null)
+        {
+            throw new IllegalArgumentException("outerKeySelector is null.");
+        }
+        if (innerKeySelector == null)
+        {
+            throw new IllegalArgumentException("innerKeySelector is null.");
+        }
+        if (resultSelector == null)
+        {
+            throw new IllegalArgumentException("resultSelector is null.");
+        }
+        if (keyType == null)
+        {
+            throw new IllegalArgumentException("keyType is null.");
+        }
+        if (elementType == null)
+        {
+            throw new IllegalArgumentException("elementType is null.");
+        }
+
+        return new EnumerableAdapter<>(
+            () -> new JoinIterator<>(outer, inner,
+                outerKeySelector, innerKeySelector, resultSelector,
+                null, keyType, elementType));
+    }
+
+    /**
+     * Correlates the elements of two sequences based on matching keys. The
+     * default equality comparer is used to compare keys.
+     *
+     * @param <TOuter>
+     *            The type of the elements of the first sequence.
+     * @param <TInner>
+     *            The type of the elements of the second sequence.
+     * @param <TKey>
+     *            The type of the keys returned by the key selector functions.
+     * @param <TResult>
+     *            The type of the result elements.
+     * @param outer
+     *            The first sequence to join.
+     * @param inner
+     *            The sequence to join to the first sequence.
+     * @param outerKeySelector
+     *            A function to extract the join key from each element of the
+     *            first sequence.
+     * @param innerKeySelector
+     *            A function to extract the join key from each element of the
+     *            second sequence.
+     * @param resultSelector
+     *            A function to create a result element from two matching
+     *            elements.
+     * @param comparer
+     *            An {@link IEqualityComparer} to hash and compare keys.
+     * @param keyType
+     *            The type of the keys returned by the key selector functions.
+     * @param elementType
+     *            The type of the elements of the second sequence.
+     * @return An {@link IEnumerable} that has elements of type
+     *         <code>TResult</code> that are obtained by performing an inner
+     *         join on two sequences.
+     */
+    public static <TOuter, TInner, TKey, TResult> IEnumerable<TResult> join(
+        Iterable<TOuter> outer,
+        Iterable<TInner> inner,
+        Function<TOuter, TKey> outerKeySelector,
+        Function<TInner, TKey> innerKeySelector,
+        BiFunction<TOuter, TInner, TResult> resultSelector,
+        IEqualityComparer<TKey> comparer,
+        Class<TKey> keyType,
+        Class<TInner> elementType)
+    {
+        if (outer == null)
+        {
+            throw new IllegalArgumentException("outer is null.");
+        }
+        if (inner == null)
+        {
+            throw new IllegalArgumentException("inner is null.");
+        }
+        if (outerKeySelector == null)
+        {
+            throw new IllegalArgumentException("outerKeySelector is null.");
+        }
+        if (innerKeySelector == null)
+        {
+            throw new IllegalArgumentException("innerKeySelector is null.");
+        }
+        if (resultSelector == null)
+        {
+            throw new IllegalArgumentException("resultSelector is null.");
+        }
+        if (keyType == null)
+        {
+            throw new IllegalArgumentException("keyType is null.");
+        }
+        if (elementType == null)
+        {
+            throw new IllegalArgumentException("elementType is null.");
+        }
+
+        return new EnumerableAdapter<>(
+            () -> new JoinIterator<>(outer, inner,
+                outerKeySelector, innerKeySelector, resultSelector,
+                comparer, keyType, elementType));
+    }
+
+    private static class JoinIterator<TOuter, TInner, TKey, TResult> extends SimpleIterator<TResult>
+    {
+        public JoinIterator(Iterable<TOuter> outer,
+            Iterable<TInner> inner,
+            Function<TOuter, TKey> outerKeySelector,
+            Function<TInner, TKey> innerKeySelector,
+            BiFunction<TOuter, TInner, TResult> resultSelector,
+            IEqualityComparer<TKey> comparer,
+            Class<TKey> keyType,
+            Class<TInner> elementType)
+        {
+            lookup = Lookup.createForJoin(inner, innerKeySelector, comparer, keyType, elementType);
+            this.outerKeySelector = outerKeySelector;
+            this.resultSelector = resultSelector;
+
+            outerIterator = outer.iterator();
+        }
+
+        private final Lookup<TKey, TInner> lookup;
+        private final Function<TOuter, TKey> outerKeySelector;
+        private final BiFunction<TOuter, TInner, TResult> resultSelector;
+
+        private TOuter currentOuter;
+        private Iterator<TOuter> outerIterator;
+        private IEnumerator<TInner> groupEnumerator;
+
+        @Override
+        public boolean moveNext()
+        {
+            while (groupEnumerator != null)
+            {
+                if (groupEnumerator.moveNext())
+                {
+                    setCurrent(resultSelector.apply(currentOuter, groupEnumerator.getCurrent()));
+                    return true;
+                }
+
+                groupEnumerator = null;
+            }
+
+            while (groupEnumerator == null && outerIterator.hasNext())
+            {
+                currentOuter = outerIterator.next();
+                Lookup<TKey, TInner>.Grouping group = lookup.getGrouping(outerKeySelector.apply(currentOuter), false);
+                if (group != null)
+                {
+                    groupEnumerator = group.getEnumerator();
+                    if (groupEnumerator.moveNext())
+                    {
+                        setCurrent(resultSelector.apply(currentOuter, groupEnumerator.getCurrent()));
+                        return true;
+                    }
+
+                    groupEnumerator = null;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    // endregion
+
     // region: Grouped Enumerable
 
     private static class GroupedEnumerable<TSource, TKey, TElement> implements IEnumerable<IGrouping<TKey, TElement>>

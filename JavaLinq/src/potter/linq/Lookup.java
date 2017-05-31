@@ -37,7 +37,7 @@ public class Lookup<TKey, TElement> implements ILookup<TKey, TElement>
         return lookup;
     }
 
-    static <TKey, TElement> Lookup<TKey, TElement> createForJoin(IEnumerable<TElement> source,
+    static <TKey, TElement> Lookup<TKey, TElement> createForJoin(Iterable<TElement> source,
         Function<TElement, TKey> keySelector,
         IEqualityComparer<TKey> comparer,
         Class<TKey> keyType,
@@ -175,7 +175,7 @@ public class Lookup<TKey, TElement> implements ILookup<TKey, TElement>
     }
 
     @SuppressWarnings("unchecked")
-    private Grouping getGrouping(TKey key, boolean create)
+    Grouping getGrouping(TKey key, boolean create)
     {
         int hashCode = internalHashCode(key);
         for (Grouping group = (Grouping) groupings[hashCode % groupings.length];
@@ -234,7 +234,7 @@ public class Lookup<TKey, TElement> implements ILookup<TKey, TElement>
         groupings = newGroupings;
     }
 
-    private class Grouping implements IGrouping<TKey, TElement>, List<TElement>
+    class Grouping implements IGrouping<TKey, TElement>, List<TElement>
     {
         public Grouping(TKey key, int hashCode, ArrayList<TElement> elements)
         {
