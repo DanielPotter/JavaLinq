@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 /**
  * Wraps an {@link Iterable} into an object that implements the
  * {@link IEnumerable} interface.
- * 
+ *
  * @author Daniel Potter
  *
  * @param <T>
@@ -16,7 +16,7 @@ public class EnumerableAdapter<T> implements IEnumerable<T>
 {
     /**
      * Creates a new instance with an {@link Iterable}.
-     * 
+     *
      * @param source
      *            The iterable to adapt.
      */
@@ -27,7 +27,7 @@ public class EnumerableAdapter<T> implements IEnumerable<T>
 
     /**
      * Creates a new instance with an {@link IEnumerable}.
-     * 
+     *
      * @param source
      *            The enumerable to adapt.
      */
@@ -39,11 +39,11 @@ public class EnumerableAdapter<T> implements IEnumerable<T>
 
     /**
      * Creates a new instance with an {@link IEnumerator} factory.
-     * 
+     *
      * @param factory
      *            The factory that creates the {@link IEnumerator} instances.
      */
-    EnumerableAdapter(Supplier<IEnumerator<T>> factory)
+    public EnumerableAdapter(Supplier<IEnumerator<T>> factory)
     {
         this.factory = factory;
     }
