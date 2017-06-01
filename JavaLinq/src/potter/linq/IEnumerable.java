@@ -1028,8 +1028,7 @@ public interface IEnumerable<T> extends Iterable<T>
     // region: Contains
 
     /**
-     * Determines whether a sequence contains a specified element by using the
-     * default equality comparer.
+     * Determines whether a sequence contains a specified element.
      *
      * @param value
      *            The value to locate in the sequence.
@@ -1039,6 +1038,56 @@ public interface IEnumerable<T> extends Iterable<T>
     default boolean contains(T value)
     {
         return Linq.contains(this, value);
+    }
+
+    /**
+     * Determines whether a sequence contains a specified element by using the
+     * default equality comparer for a type.
+     *
+     * @param value
+     *            The value to locate in the sequence.
+     * @param type
+     *            The type of the elements of <code>source</code>.
+     * @return <code>true</code> if the source sequence contains an element that
+     *         has the specified value; otherwise, <code>false</code>.
+     */
+    default boolean contains(T value, Class<T> type)
+    {
+        return Linq.contains(this, value, type);
+    }
+
+    /**
+     * Determines whether a sequence contains a specified element by using a
+     * specified {@link IEqualityComparer}.
+     *
+     * @param value
+     *            The value to locate in the sequence.
+     * @param comparer
+     *            An equality comparer to compare values.
+     * @return <code>true</code> if the source sequence contains an element that
+     *         has the specified value; otherwise, <code>false</code>.
+     */
+    default boolean contains(T value, IEqualityComparer<T> comparer)
+    {
+        return Linq.contains(this, value, comparer);
+    }
+
+    /**
+     * Determines whether a sequence contains a specified element by using a
+     * specified {@link IEqualityComparer}.
+     *
+     * @param value
+     *            The value to locate in the sequence.
+     * @param comparer
+     *            An equality comparer to compare values.
+     * @param type
+     *            The type of the elements of <code>source</code>.
+     * @return <code>true</code> if the source sequence contains an element that
+     *         has the specified value; otherwise, <code>false</code>.
+     */
+    default boolean contains(T value, IEqualityComparer<T> comparer, Class<T> type)
+    {
+        return Linq.contains(this, value, comparer, type);
     }
 
     // endregion

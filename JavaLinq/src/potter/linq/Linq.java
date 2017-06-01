@@ -3024,8 +3024,7 @@ public class Linq
     // region: Contains
 
     /**
-     * Determines whether a sequence contains a specified element by using the
-     * default equality comparer.
+     * Determines whether a sequence contains a specified element.
      *
      * @param <TSource>
      *            The type of the elements of <code>source</code>.
@@ -3038,19 +3037,131 @@ public class Linq
      */
     public static <TSource> boolean contains(Iterable<TSource> source, TSource value)
     {
+        return internalContains(source, value, null);
+    }
+
+    /**
+     * Determines whether a sequence contains a specified element by using the
+     * default equality comparer for a type.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            A sequence in which to locate a value.
+     * @param value
+     *            The value to locate in the sequence.
+     * @param type
+     *            The type of the elements of <code>source</code>.
+     * @return <code>true</code> if the source sequence contains an element that
+     *         has the specified value; otherwise, <code>false</code>.
+     */
+    public static <TSource> boolean contains(Iterable<TSource> source, TSource value, Class<TSource> type)
+    {
+        if (type == null)
+        {
+            throw new IllegalArgumentException("type is null.");
+        }
+
+        IEqualityComparer<TSource> comparer = EqualityComparer.getDefault(type);
+
+        return internalContains(source, value, comparer);
+    }
+
+    /**
+     * Determines whether a sequence contains a specified element by using a
+     * specified {@link IEqualityComparer}.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            A sequence in which to locate a value.
+     * @param value
+     *            The value to locate in the sequence.
+     * @param comparer
+     *            An equality comparer to compare values.
+     * @return <code>true</code> if the source sequence contains an element that
+     *         has the specified value; otherwise, <code>false</code>.
+     */
+    public static <TSource> boolean contains(Iterable<TSource> source, TSource value,
+        IEqualityComparer<TSource> comparer)
+    {
+        if (comparer == null)
+        {
+            throw new IllegalArgumentException("comparer is null.");
+        }
+
+        return internalContains(source, value, comparer);
+    }
+
+    /**
+     * Determines whether a sequence contains a specified element by using a
+     * specified {@link IEqualityComparer}.
+     *
+     * @param <TSource>
+     *            The type of the elements of <code>source</code>.
+     * @param source
+     *            A sequence in which to locate a value.
+     * @param value
+     *            The value to locate in the sequence.
+     * @param comparer
+     *            An equality comparer to compare values.
+     * @param type
+     *            The type of the elements of <code>source</code>.
+     * @return <code>true</code> if the source sequence contains an element that
+     *         has the specified value; otherwise, <code>false</code>.
+     */
+    public static <TSource> boolean contains(Iterable<TSource> source, TSource value,
+        IEqualityComparer<TSource> comparer, Class<TSource> type)
+    {
+        if (comparer == null)
+        {
+            if (type == null)
+            {
+                throw new IllegalArgumentException("type is null.");
+            }
+
+            comparer = EqualityComparer.getDefault(type);
+        }
+
+        return internalContains(source, value, comparer);
+    }
+
+    private static <TSource> boolean internalContains(Iterable<TSource> source, TSource value,
+        IEqualityComparer<TSource> comparer)
+    {
         if (source == null)
         {
             throw new IllegalArgumentException("source is null.");
         }
 
-        if (source instanceof Collection<?>)
+        if (comparer == null)
         {
-            return ((Collection<?>) source).contains(value);
+            if (source instanceof Collection<?>)
+            {
+                return ((Collection<?>) source).contains(value);
+            }
+
+            for (TSource item : source)
+            {
+                if (value == null)
+                {
+                    if (item == null)
+                    {
+                        return true;
+                    }
+                }
+                else if (value.equals(item))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         for (TSource item : source)
         {
-            if (value.equals(item))
+            if (comparer.equals(value, item))
             {
                 return true;
             }
