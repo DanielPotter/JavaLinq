@@ -235,6 +235,63 @@ public class Linq
 
     // region: Mutation
 
+    // region: Cast
+
+    /**
+     * Casts the elements of an {@link Iterable} to the specified type.
+     *
+     * @param <TResult>
+     *            The type to which to cast the elements of the sequence.
+     * @param source
+     *            The {@link Iterable} that contains the elements to be cast to
+     *            type <code>TResult</code>.
+     * @param type
+     *            The type to which to cast the elements of the sequence.
+     * @return An {@link IEnumerable} that contains each element of the source
+     *         sequence cast to the specified type.
+     */
+    public static <TResult> IEnumerable<TResult> cast(Iterable<?> source, Class<TResult> type)
+    {
+        if (source == null)
+        {
+            throw new IllegalArgumentException("source is null.");
+        }
+        if (type == null)
+        {
+            throw new IllegalArgumentException("type is null.");
+        }
+
+        return new EnumerableAdapter<>(() -> new CastIterator<>(source, type));
+    }
+
+    private static class CastIterator<TResult> extends SimpleIterator<TResult>
+    {
+        public CastIterator(Iterable<?> source, Class<TResult> type)
+        {
+            this.type = type;
+            sourceIterator = source.iterator();
+        }
+
+        private final Class<TResult> type;
+        private final Iterator<?> sourceIterator;
+
+        @Override
+        public boolean moveNext()
+        {
+            if (sourceIterator.hasNext())
+            {
+                Object input = sourceIterator.next();
+                TResult currentValue = type.cast(input);
+                setCurrent(currentValue);
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    // endregion
+
     // region: Concat
 
     /**
